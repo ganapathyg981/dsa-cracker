@@ -9,15 +9,21 @@ export const monotonicStack = {
 
 This efficiently finds "next greater/smaller element" in O(n) - each element is pushed and popped at most once.
 
-Monotonic queue (using deque) extends this for sliding window max/min problems.`,
+Monotonic queue (using deque) extends this for sliding window max/min problems and DP optimization.
+
+KEY APPLICATIONS:
+- Next/Previous Greater/Smaller: Record when pushing (previous) or popping (next)
+- Subarray contribution: Count how many subarrays have element as min/max
+- DP optimization: A[i] = min(A[j:k]) + C can use monotonic queue`,
     
     keyInsight: 'When you push, pop all elements that violate monotonicity. Each element enters/exits once = O(n) total.',
     
     whenToUse: [
-      'Next greater/smaller element',
-      'Previous greater/smaller element',
+      'Next/previous greater/smaller element',
       'Sliding window maximum/minimum',
       'Histogram problems (largest rectangle)',
+      'Count subarrays where element is min/max',
+      'DP with min/max over sliding range',
       'Stock span problems'
     ],
     
@@ -30,9 +36,10 @@ Monotonic queue (using deque) extends this for sliding window max/min problems.`
   decisionTree: {
     question: "What do you need to find?",
     options: [
-      { label: "Next greater/smaller element", result: "next-greater" },
-      { label: "Sliding window maximum", result: "sliding-max" },
-      { label: "Largest rectangle in histogram", result: "histogram" }
+      { label: "Next/previous greater/smaller element", result: "next-greater" },
+      { label: "Sliding window maximum/minimum", result: "sliding-max" },
+      { label: "Largest rectangle in histogram", result: "histogram" },
+      { label: "Count subarrays with element as min/max", result: "subarray-contribution" }
     ]
   },
 
@@ -210,6 +217,95 @@ def daily_temperatures(temps: List[int]) -> List[int]:
         output: '10',
         explanation: 'Rectangle with heights 5,6 has area 10'
       }
+    },
+    {
+      id: 'subarray-contribution',
+      name: 'Sum of Subarray Minimums',
+      description: 'Find left/right boundaries where each element is min. Contribution = value × left_count × right_count.',
+      java: `public int sumSubarrayMins(int[] arr) {
+    int MOD = 1_000_000_007;
+    int n = arr.length;
+    
+    // left[i] = distance to previous less element
+    // right[i] = distance to next less element
+    int[] left = new int[n];
+    int[] right = new int[n];
+    
+    Deque<Integer> stack = new ArrayDeque<>();
+    
+    // Find previous less (increasing stack)
+    for (int i = 0; i < n; i++) {
+        while (!stack.isEmpty() && arr[stack.peek()] > arr[i]) {
+            stack.pop();
+        }
+        left[i] = stack.isEmpty() ? i + 1 : i - stack.peek();
+        stack.push(i);
+    }
+    
+    stack.clear();
+    
+    // Find next less (increasing stack)
+    for (int i = 0; i < n; i++) {
+        while (!stack.isEmpty() && arr[stack.peek()] > arr[i]) {
+            int j = stack.pop();
+            right[j] = i - j;
+        }
+        stack.push(i);
+    }
+    while (!stack.isEmpty()) {
+        int j = stack.pop();
+        right[j] = n - j;
+    }
+    
+    long result = 0;
+    for (int i = 0; i < n; i++) {
+        result = (result + (long) arr[i] * left[i] * right[i]) % MOD;
+    }
+    
+    return (int) result;
+}`,
+      python: `def sum_subarray_mins(arr: List[int]) -> int:
+    MOD = 10**9 + 7
+    n = len(arr)
+    
+    # left[i] = distance to previous less element
+    # right[i] = distance to next less element
+    left = [0] * n
+    right = [0] * n
+    stack = []
+    
+    # Find previous less (increasing stack)
+    for i in range(n):
+        while stack and arr[stack[-1]] > arr[i]:
+            stack.pop()
+        left[i] = i + 1 if not stack else i - stack[-1]
+        stack.append(i)
+    
+    stack.clear()
+    
+    # Find next less (increasing stack)
+    for i in range(n):
+        while stack and arr[stack[-1]] > arr[i]:
+            j = stack.pop()
+            right[j] = i - j
+        stack.append(i)
+    
+    while stack:
+        j = stack.pop()
+        right[j] = n - j
+    
+    result = 0
+    for i in range(n):
+        result = (result + arr[i] * left[i] * right[i]) % MOD
+    
+    return result`,
+      timeComplexity: 'O(n)',
+      spaceComplexity: 'O(n)',
+      testCase: {
+        input: 'arr = [3,1,2,4]',
+        output: '17',
+        explanation: 'Sum of minimums: [3]=3, [1]=1, [2]=2, [4]=4, [3,1]=1, [1,2]=1, [2,4]=2, [3,1,2]=1, [1,2,4]=1, [3,1,2,4]=1'
+      }
     }
   ],
 
@@ -219,7 +315,9 @@ def daily_temperatures(temps: List[int]) -> List[int]:
     { name: 'Sliding Window Maximum', difficulty: 'Hard', tags: ['monotonic deque'] },
     { name: 'Largest Rectangle in Histogram', difficulty: 'Hard', tags: ['histogram'] },
     { name: 'Maximal Rectangle', difficulty: 'Hard', tags: ['histogram', '2D'] },
-    { name: 'Stock Span Problem', difficulty: 'Medium', tags: ['previous greater'] },
+    { name: 'Online Stock Span', difficulty: 'Medium', tags: ['previous greater'] },
+    { name: 'Sum of Subarray Minimums', difficulty: 'Medium', tags: ['contribution'] },
+    { name: 'Shortest Subarray with Sum at Least K', difficulty: 'Hard', tags: ['monotonic deque', 'prefix sum'] },
     { name: 'Trapping Rain Water', difficulty: 'Hard', tags: ['two approaches'] }
   ],
 
@@ -235,6 +333,10 @@ def daily_temperatures(temps: List[int]) -> List[int]:
     {
       trap: 'Wrong monotonicity direction',
       fix: 'Next greater: decreasing stack. Next smaller: increasing stack.'
+    },
+    {
+      trap: 'In contribution problems, counting duplicates incorrectly',
+      fix: 'Use strict less (<) for one direction, non-strict (<=) for other to avoid double counting.'
     }
   ],
 
@@ -246,6 +348,10 @@ def daily_temperatures(temps: List[int]) -> List[int]:
     {
       name: 'Previous Greater/Smaller',
       description: 'Process left to right, answer is stack top when pushing.'
+    },
+    {
+      name: 'Monotonic Queue for DP',
+      description: 'DP where A[i] = min/max(A[j:k]) + C. Use monotonic deque to maintain window min/max in O(1).'
     }
   ]
 };

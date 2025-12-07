@@ -295,6 +295,116 @@ def jump(nums: List[int]) -> int:
         output: '1',
         explanation: 'Only child with greed 1 can be satisfied'
       }
+    },
+    {
+      id: 'lemonade-change',
+      name: 'Lemonade Change',
+      description: 'Track bills, prioritize giving larger bills as change.',
+      java: `public boolean lemonadeChange(int[] bills) {
+    int five = 0, ten = 0;
+    
+    for (int bill : bills) {
+        if (bill == 5) {
+            five++;
+        } else if (bill == 10) {
+            if (five == 0) return false;
+            five--;
+            ten++;
+        } else {  // bill == 20
+            // Prefer giving 1 ten + 1 five (save smaller bills)
+            if (ten > 0 && five > 0) {
+                ten--;
+                five--;
+            } else if (five >= 3) {
+                five -= 3;
+            } else {
+                return false;
+            }
+        }
+    }
+    
+    return true;
+}`,
+      python: `def lemonade_change(bills: List[int]) -> bool:
+    five = 0
+    ten = 0
+    
+    for bill in bills:
+        if bill == 5:
+            five += 1
+        elif bill == 10:
+            if five == 0:
+                return False
+            five -= 1
+            ten += 1
+        else:  # bill == 20
+            # Prefer giving 1 ten + 1 five (save smaller bills)
+            if ten > 0 and five > 0:
+                ten -= 1
+                five -= 1
+            elif five >= 3:
+                five -= 3
+            else:
+                return False
+    
+    return True`,
+      timeComplexity: 'O(n)',
+      spaceComplexity: 'O(1)',
+      testCase: {
+        input: 'bills = [5,5,5,10,20]',
+        output: 'true',
+        explanation: 'Can make change for each customer'
+      }
+    },
+    {
+      id: 'candy',
+      name: 'Candy Distribution',
+      description: 'Two passes: left-to-right for ascending, right-to-left for descending ratings.',
+      java: `public int candy(int[] ratings) {
+    int n = ratings.length;
+    int[] candies = new int[n];
+    Arrays.fill(candies, 1);
+    
+    // Left to right: if rating[i] > rating[i-1]
+    for (int i = 1; i < n; i++) {
+        if (ratings[i] > ratings[i - 1]) {
+            candies[i] = candies[i - 1] + 1;
+        }
+    }
+    
+    // Right to left: if rating[i] > rating[i+1]
+    int total = candies[n - 1];
+    for (int i = n - 2; i >= 0; i--) {
+        if (ratings[i] > ratings[i + 1]) {
+            candies[i] = Math.max(candies[i], candies[i + 1] + 1);
+        }
+        total += candies[i];
+    }
+    
+    return total;
+}`,
+      python: `def candy(ratings: List[int]) -> int:
+    n = len(ratings)
+    candies = [1] * n
+    
+    # Left to right: if rating[i] > rating[i-1]
+    for i in range(1, n):
+        if ratings[i] > ratings[i - 1]:
+            candies[i] = candies[i - 1] + 1
+    
+    # Right to left: if rating[i] > rating[i+1]
+    for i in range(n - 2, -1, -1):
+        if ratings[i] > ratings[i + 1]:
+            candies[i] = max(candies[i], candies[i + 1] + 1)
+    
+    return sum(candies)`,
+      timeComplexity: 'O(n)',
+      spaceComplexity: 'O(n)',
+      testCase: {
+        input: 'ratings = [1,0,2]',
+        output: '5',
+        explanation: 'Candies: [2,1,2] = 5 total'
+      }
     }
   ],
 
@@ -304,9 +414,20 @@ def jump(nums: List[int]) -> int:
     { name: 'Gas Station', difficulty: 'Medium', tags: ['circular', 'running sum'] },
     { name: 'Partition Labels', difficulty: 'Medium', tags: ['intervals', 'last occurrence'] },
     { name: 'Assign Cookies', difficulty: 'Easy', tags: ['sorting', 'matching'] },
+    { name: 'Best Time to Buy and Sell Stock', difficulty: 'Easy', tags: ['track min', 'max profit'] },
     { name: 'Best Time to Buy and Sell Stock II', difficulty: 'Medium', tags: ['collect all profits'] },
+    { name: 'Lemonade Change', difficulty: 'Easy', tags: ['simulation', 'greedy change'] },
     { name: 'Task Scheduler', difficulty: 'Medium', tags: ['scheduling', 'cooldown'] },
     { name: 'Candy', difficulty: 'Hard', tags: ['two pass', 'neighbors'] },
+    { name: 'Remove K Digits', difficulty: 'Medium', tags: ['stack', 'monotonic'] },
+    { name: 'Wiggle Subsequence', difficulty: 'Medium', tags: ['greedy peaks'] },
+    { name: 'Boats to Save People', difficulty: 'Medium', tags: ['two pointers', 'pairing'] },
+    { name: 'Queue Reconstruction by Height', difficulty: 'Medium', tags: ['sorting', 'insertion'] },
+    { name: 'Reorganize String', difficulty: 'Medium', tags: ['heap', 'frequency'] },
+    { name: 'Car Pooling', difficulty: 'Medium', tags: ['difference array', 'capacity'] },
+    { name: 'Divide Array in Sets of K Consecutive Numbers', difficulty: 'Medium', tags: ['ordered map', 'consecutive'] },
+    { name: 'Minimum Add to Make Parentheses Valid', difficulty: 'Medium', tags: ['balance', 'count'] },
+    { name: 'Remove Duplicate Letters', difficulty: 'Medium', tags: ['stack', 'lexicographic'] },
     { name: 'Minimum Number of Arrows to Burst Balloons', difficulty: 'Medium', tags: ['intervals'] }
   ],
 
@@ -326,6 +447,14 @@ def jump(nums: List[int]) -> int:
     {
       trap: 'Using greedy when DP is needed (e.g., coin change with arbitrary denominations)',
       fix: 'Greedy fails for coin change with [1, 3, 4] target 6. Use DP when greedy proof fails.'
+    },
+    {
+      trap: 'In Candy problem, doing only one pass left-to-right or right-to-left',
+      fix: 'Need TWO passes: left-to-right for increasing ratings, right-to-left for decreasing, then take max.'
+    },
+    {
+      trap: 'In Lemonade Change, giving wrong bills (e.g., three $5 bills when you have $10+$5)',
+      fix: 'For $20 customer, prefer giving $10+$5 to save smaller bills for future. Only give 3×$5 if no $10.'
     }
   ],
 
@@ -341,6 +470,14 @@ def jump(nums: List[int]) -> int:
     {
       name: 'Huffman Coding',
       description: 'Greedy algorithm for optimal prefix-free codes. Always merge two lowest frequency nodes.'
+    },
+    {
+      name: 'Graph Algorithms (MST)',
+      description: 'Kruskal\'s and Prim\'s are greedy: always pick minimum weight edge that doesn\'t create cycle (Kruskal) or minimum edge from tree (Prim).'
+    },
+    {
+      name: 'Dijkstra\'s Shortest Path',
+      description: 'Greedy selection of unvisited node with minimum distance. Fails with negative weights (use Bellman-Ford).'
     }
   ]
 };

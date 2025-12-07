@@ -56,13 +56,6 @@ code {
   font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
 }
 
-/* Smooth transitions */
-* {
-  transition-property: background-color, border-color, color, fill, stroke;
-  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-  transition-duration: 150ms;
-}
-
 /* Focus styles */
 button:focus-visible,
 a:focus-visible,
@@ -82,7 +75,11 @@ input:focus-visible {
   background: linear-gradient(135deg, #1e1e1e 0%, #2d2d2d 100%);
 }
 
-/* Animations */
+/* ============================================
+   ANIMATIONS - Fun and engaging for study groups
+   ============================================ */
+
+/* Fade in animation */
 @keyframes fadeIn {
   from {
     opacity: 0;
@@ -98,7 +95,131 @@ input:focus-visible {
   animation: fadeIn 0.3s ease-out;
 }
 
-/* Custom utility classes */
+/* Scale in animation for modals */
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.animate-scale-in {
+  animation: scaleIn 0.2s ease-out;
+}
+
+/* Slow bounce for streak icons */
+@keyframes bounceSlow {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-5px);
+  }
+}
+
+.animate-bounce-slow {
+  animation: bounceSlow 2s ease-in-out infinite;
+}
+
+/* Pulse animation for highlights */
+@keyframes pulseGlow {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(139, 92, 246, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 0 8px rgba(139, 92, 246, 0);
+  }
+}
+
+.animate-pulse-glow {
+  animation: pulseGlow 2s ease-in-out infinite;
+}
+
+/* Slide in from left */
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.animate-slide-in-left {
+  animation: slideInLeft 0.3s ease-out;
+}
+
+/* Confetti keyframes for celebrations */
+@keyframes confettiDrop {
+  0% {
+    transform: translateY(-100vh) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(100vh) rotate(720deg);
+    opacity: 0;
+  }
+}
+
+/* Shimmer effect for loading states */
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.animate-shimmer {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+/* Wiggle animation for attention */
+@keyframes wiggle {
+  0%, 100% {
+    transform: rotate(0deg);
+  }
+  25% {
+    transform: rotate(-5deg);
+  }
+  75% {
+    transform: rotate(5deg);
+  }
+}
+
+.animate-wiggle {
+  animation: wiggle 0.3s ease-in-out;
+}
+
+/* Hover wiggle on elements */
+.hover-wiggle:hover {
+  animation: wiggle 0.3s ease-in-out;
+}
+
+/* Progress bar fill animation */
+@keyframes fillProgress {
+  from {
+    width: 0%;
+  }
+}
+
+.animate-fill-progress {
+  animation: fillProgress 1s ease-out;
+}
+
+/* ============================================
+   UTILITY CLASSES
+   ============================================ */
+
 @layer utilities {
   .text-balance {
     text-wrap: balance;
@@ -106,5 +227,85 @@ input:focus-visible {
   
   .scrollbar-thin {
     scrollbar-width: thin;
+  }
+  
+  /* Glass morphism effect */
+  .glass {
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+  }
+  
+  /* Gradient text */
+  .gradient-text {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  
+  /* Card hover lift effect */
+  .card-hover {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+  
+  .card-hover:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+  }
+}
+
+/* ============================================
+   IMPROVED CODE BLOCK STYLING
+   ============================================ */
+
+/* Line numbers styling */
+pre .table-row:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+/* Better syntax highlighting contrast */
+pre code {
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+/* Horizontal scroll indicator for code */
+pre {
+  position: relative;
+}
+
+pre::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 30px;
+  background: linear-gradient(to right, transparent, #011627);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+pre:hover::after {
+  opacity: 1;
+}
+
+/* ============================================
+   RESPONSIVE ADJUSTMENTS
+   ============================================ */
+
+@media (max-width: 768px) {
+  .grid-cols-4 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .grid-cols-3 {
+    grid-template-columns: 1fr;
+  }
+  
+  .col-span-2 {
+    grid-column: span 1;
   }
 }

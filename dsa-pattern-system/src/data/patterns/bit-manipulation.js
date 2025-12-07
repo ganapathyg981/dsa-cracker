@@ -7,9 +7,21 @@ export const bitManipulation = {
   theory: {
     overview: `Bit manipulation operates directly on binary representations. Key operations: AND (&), OR (|), XOR (^), NOT (~), left shift (<<), right shift (>>).
 
-XOR is especially powerful: a^a=0, a^0=a. This enables finding single numbers, swapping without temp, and detecting differences.
+XOR is especially powerful: a^a=0, a^0=a, commutative and associative. This enables finding single numbers, swapping without temp, and detecting differences.
 
-Common tricks: n&(n-1) removes lowest set bit, n&(-n) isolates lowest set bit, check if power of 2 with n&(n-1)==0.`,
+Common tricks: n&(n-1) removes lowest set bit, n&(-n) isolates lowest set bit, check if power of 2 with n&(n-1)==0.
+
+IMPORTANT RELATIONS:
+• (a|b) = (a+b) - (a&b)
+• (a+b) = (a^b) + 2*(a&b)
+• Left shift (<<) multiplies by 2, right shift (>>) divides by 2
+• Bitwise ops are O(1) and faster than arithmetic ops
+
+XOR PROPERTIES:
+• a^0 = a
+• a^a = 0
+• x^y = y^x (commutative)
+• (x^y)^z = x^(y^z) (associative)`,
     
     keyInsight: 'XOR: same bits cancel (a^a=0). AND with n-1 removes lowest bit. Shift for multiply/divide by 2.',
     
@@ -18,7 +30,8 @@ Common tricks: n&(n-1) removes lowest set bit, n&(-n) isolates lowest set bit, c
       'Counting set bits',
       'Power of 2 checks',
       'Subset generation with bitmasks',
-      'Optimization in competitive programming'
+      'Optimization in competitive programming',
+      'Space optimization (bitset uses 8x less than boolean array)'
     ],
     
     complexity: {
@@ -32,8 +45,10 @@ Common tricks: n&(n-1) removes lowest set bit, n&(-n) isolates lowest set bit, c
     options: [
       { label: "Find single/missing number", result: "xor-single" },
       { label: "Count set bits", result: "count-bits" },
-      { label: "Power of 2 check", result: "power-of-2" },
-      { label: "Subset enumeration with bitmask", result: "bitmask" }
+      { label: "Power of 2/4 check", result: "power-of-2" },
+      { label: "Subset enumeration with bitmask", result: "bitmask" },
+      { label: "XOR range queries", result: "xor-queries" },
+      { label: "Add without + operator", result: "add-xor" }
     ]
   },
 
@@ -244,44 +259,202 @@ def subsets(nums: List[int]) -> List[List[int]]:
         output: '[[], [1], [2], [1,2]]',
         explanation: 'mask 00=[], 01=[1], 10=[2], 11=[1,2]'
       }
+    },
+    {
+      id: 'xor-queries',
+      name: 'XOR Range Queries',
+      description: 'Use prefix XOR array. query[l,r] = prefix[r] ^ prefix[l-1]',
+      java: `public int[] xorQueries(int[] arr, int[][] queries) {
+    int n = arr.length;
+    int[] prefix = new int[n];
+    prefix[0] = arr[0];
+    
+    // Build prefix XOR array
+    for (int i = 1; i < n; i++) {
+        prefix[i] = prefix[i - 1] ^ arr[i];
+    }
+    
+    int[] result = new int[queries.length];
+    for (int i = 0; i < queries.length; i++) {
+        int l = queries[i][0];
+        int r = queries[i][1];
+        
+        if (l == 0) {
+            result[i] = prefix[r];
+        } else {
+            result[i] = prefix[r] ^ prefix[l - 1];
+        }
+    }
+    
+    return result;
+}`,
+      python: `def xor_queries(arr: List[int], queries: List[List[int]]) -> List[int]:
+    n = len(arr)
+    prefix = [0] * n
+    prefix[0] = arr[0]
+    
+    # Build prefix XOR array
+    for i in range(1, n):
+        prefix[i] = prefix[i - 1] ^ arr[i]
+    
+    result = []
+    for l, r in queries:
+        if l == 0:
+            result.append(prefix[r])
+        else:
+            result.append(prefix[r] ^ prefix[l - 1])
+    
+    return result`,
+      timeComplexity: 'O(n + q)',
+      spaceComplexity: 'O(n)',
+      testCase: {
+        input: 'arr = [1,3,4,8], queries = [[0,1],[1,2],[0,3]]',
+        output: '[2,7,4]',
+        explanation: '[0,1]: 1^3=2, [1,2]: 3^4=7, [0,3]: 1^3^4^8=4'
+      }
+    },
+    {
+      id: 'add-xor',
+      name: 'Add Two Integers without + Operator',
+      description: 'Use XOR for sum without carry, AND<<1 for carry. Repeat until carry is 0.',
+      java: `public int getSum(int a, int b) {
+    while (b != 0) {
+        int sum = a ^ b;        // XOR for sum without carry
+        int carry = (a & b) << 1;  // AND<<1 for carry
+        a = sum;
+        b = carry;
+    }
+    return a;
+}`,
+      python: `def get_sum(a: int, b: int) -> int:
+    # Python requires handling for negative numbers (32-bit mask)
+    mask = 0xFFFFFFFF
+    
+    while b != 0:
+        sum_without_carry = (a ^ b) & mask
+        carry = ((a & b) << 1) & mask
+        a = sum_without_carry
+        b = carry
+    
+    # Handle negative result
+    return a if a <= 0x7FFFFFFF else ~(a ^ mask)`,
+      timeComplexity: 'O(1) - limited to 32 bits',
+      spaceComplexity: 'O(1)',
+      testCase: {
+        input: 'a = 1, b = 2',
+        output: '3',
+        explanation: 'sum=1^2=3, carry=(1&2)<<1=0. Result=3'
+      }
+    },
+    {
+      id: 'reverse-bits',
+      name: 'Reverse Bits',
+      description: 'Extract bits from right, build result from left.',
+      java: `public int reverseBits(int n) {
+    int result = 0;
+    for (int i = 0; i < 32; i++) {
+        result <<= 1;           // Shift result left
+        result |= (n & 1);      // Add rightmost bit of n
+        n >>= 1;                // Shift n right
+    }
+    return result;
+}`,
+      python: `def reverse_bits(n: int) -> int:
+    result = 0
+    for _ in range(32):
+        result <<= 1           # Shift result left
+        result |= (n & 1)      # Add rightmost bit of n
+        n >>= 1                # Shift n right
+    return result`,
+      timeComplexity: 'O(1) - always 32 bits',
+      spaceComplexity: 'O(1)',
+      testCase: {
+        input: 'n = 43261596 (00000010100101000001111010011100)',
+        output: '964176192 (00111001011110000010100101000000)',
+        explanation: 'Bits reversed'
+      }
     }
   ],
 
   problems: [
     { name: 'Single Number', difficulty: 'Easy', tags: ['XOR'] },
-    { name: 'Single Number II', difficulty: 'Medium', tags: ['bit count'] },
+    { name: 'Single Number II', difficulty: 'Medium', tags: ['bit count', 'state machine'] },
     { name: 'Single Number III', difficulty: 'Medium', tags: ['XOR', 'divide'] },
     { name: 'Missing Number', difficulty: 'Easy', tags: ['XOR'] },
     { name: 'Number of 1 Bits', difficulty: 'Easy', tags: ['count bits'] },
     { name: 'Counting Bits', difficulty: 'Easy', tags: ['DP', 'bits'] },
+    { name: 'Hamming Distance', difficulty: 'Easy', tags: ['XOR', 'count'] },
     { name: 'Power of Two', difficulty: 'Easy', tags: ['bit trick'] },
+    { name: 'Power of Four', difficulty: 'Easy', tags: ['bit trick', 'mask'] },
     { name: 'Reverse Bits', difficulty: 'Easy', tags: ['bit by bit'] },
-    { name: 'Sum of Two Integers', difficulty: 'Medium', tags: ['add without +'] }
+    { name: 'Sum of Two Integers', difficulty: 'Medium', tags: ['add without +'] },
+    { name: 'XOR Queries of a Subarray', difficulty: 'Medium', tags: ['prefix XOR'] },
+    { name: 'Bitwise ORs of Subarrays', difficulty: 'Medium', tags: ['OR', 'set'] },
+    { name: 'Bitwise AND of Numbers Range', difficulty: 'Medium', tags: ['AND', 'common prefix'] },
+    { name: 'Minimum Flips to Make a OR b Equal to c', difficulty: 'Medium', tags: ['bit manipulation'] },
+    { name: 'Count Triplets That Can Form Two Arrays of Equal XOR', difficulty: 'Medium', tags: ['prefix XOR'] },
+    { name: 'Maximum Product of Word Lengths', difficulty: 'Medium', tags: ['bitmask', 'optimization'] },
+    { name: 'Repeated DNA Sequences', difficulty: 'Medium', tags: ['bitmask', 'hashing'] },
+    { name: 'Subsets', difficulty: 'Medium', tags: ['bitmask', 'enumeration'] },
+    { name: 'Decode XORed Permutation', difficulty: 'Medium', tags: ['XOR', 'permutation'] },
+    { name: 'Find the Duplicate Number', difficulty: 'Medium', tags: ['cycle detection', 'bit'] }
   ],
 
   mistakes: [
     {
       trap: 'Integer overflow with left shift',
-      fix: 'Use 1L << n for shifts beyond 32 bits in Java. Python handles big integers.'
+      fix: 'Use 1L << n for shifts beyond 32 bits in Java. Python handles big integers. Avoid shifting left by 32 or more on 32-bit int.'
     },
     {
       trap: 'Signed vs unsigned right shift',
-      fix: 'Java: >> is signed (fills with sign bit), >>> is unsigned. Python only has >>.'
+      fix: 'Java: >> is signed (fills with sign bit), >>> is unsigned. Python only has >>. For unsigned behavior in Java, use >>> or convert to long.'
     },
     {
       trap: 'Forgetting n > 0 check in power of 2',
-      fix: '0 & (0-1) = 0, which passes the bit test. Explicitly check n > 0.'
+      fix: '0 & (0-1) = 0, which passes the bit test. Explicitly check n > 0 first.'
+    },
+    {
+      trap: 'Confusing bitwise (&, |, ^) with logical (&&, ||)',
+      fix: 'Bitwise: bit-by-bit, returns int. Logical: returns boolean. Use bitwise for bit manipulation, logical for conditions.'
+    },
+    {
+      trap: 'Not handling negative numbers in Python for add without +',
+      fix: 'Python has unlimited precision. Mask with 0xFFFFFFFF and handle negative results specially.'
+    },
+    {
+      trap: 'Wrong operator precedence: & and | have lower precedence than ==',
+      fix: 'Always use parentheses: (a & b) == 0, not a & b == 0 (which is a & (b == 0)).'
+    },
+    {
+      trap: 'Right shift on negative numbers is undefined in some languages',
+      fix: 'For predictable behavior, convert to unsigned or use unsigned right shift (>>>) in Java.'
     }
   ],
 
   variations: [
     {
+      name: 'XOR Swap Algorithm',
+      description: 'Swap without temp variable: a=a^b; b=a^b; a=a^b. Now a and b are swapped. Uses XOR properties.'
+    },
+    {
+      name: 'Parity Check in O(1)',
+      description: 'Find if number of 1 bits is even/odd. Repeatedly XOR halves: y=x^(x>>16); y=y^(y>>8); y=y^(y>>4); y=y^(y>>2); y=y^(y>>1); return y&1.'
+    },
+    {
       name: 'Gray Code',
       description: 'Adjacent numbers differ by one bit. n ^ (n >> 1) converts to gray code.'
     },
     {
-      name: 'Bit DP',
-      description: 'Use bitmask as DP state for subset problems (Traveling Salesman).'
+      name: 'Bit DP / Bitmask DP',
+      description: 'Use bitmask as DP state for subset problems (Traveling Salesman, Assignment). State space: O(2^n).'
+    },
+    {
+      name: 'Bitset for Space Optimization',
+      description: 'Use bitset instead of bool array. 8x less space. bitset<1000> uses 128 bytes vs 1000 bytes for bool[1000].'
+    },
+    {
+      name: 'Set Operations with Bits',
+      description: 'Union: A|B, Intersection: A&B, Difference: A&~B, Complement: ~A, Set bit: A|=(1<<i), Clear: A&=~(1<<i), Test: (A&(1<<i))!=0'
     }
   ]
 };

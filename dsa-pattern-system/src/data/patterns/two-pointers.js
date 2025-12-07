@@ -18,6 +18,14 @@ The key insight is that by maintaining two pointers that move intelligently base
       'In-place array modification (remove duplicates, partition)',
       'Linked list cycle detection or finding middle element'
     ],
+
+    whenNotToUse: [
+      'Two pointers works by eliminating cases that don\'t need checking. For this to work, two rules must hold:',
+      '1. If a wider scope is valid, then any narrower scope within it must also be valid',
+      '2. If a narrower scope is invalid, then any wider scope containing it must also be invalid',
+      '',
+      'Example where it FAILS: Subarray sum with negative numbers. If K=3, [1,1,1] sums to 3 (valid) but [1,1] sums to 2 (invalid) - breaks rule 1. Also, [1,1,1] sums to 3 (invalid if K=2), but [1,1,1,-1] sums to 2 (valid) - breaks rule 2.'
+    ],
     
     complexity: {
       time: 'O(n) typically, O(n²) for triplet problems',

@@ -3,7 +3,149 @@ const STORAGE_KEYS = {
   PROGRESS: 'dsa_progress',
   IMPORTED_MEMBERS: 'dsa_imported_members',
   WEEKLY_GOALS: 'dsa_weekly_goals',
+  LAST_BACKUP: 'dsa_last_backup',
 };
+
+const DB_NAME = 'DSAProgressDB';
+const DB_VERSION = 1;
+const STORE_NAME = 'backups';
+
+// IndexedDB for reliable backup
+let db = null;
+
+async function initDB() {
+  if (db) return db;
+  
+  return new Promise((resolve, reject) => {
+    const request = indexedDB.open(DB_NAME, DB_VERSION);
+    
+    request.onerror = () => reject(request.error);
+    request.onsuccess = () => {
+      db = request.result;
+      resolve(db);
+    };
+    
+    request.onupgradeneeded = (event) => {
+      const database = event.target.result;
+      if (!database.objectStoreNames.contains(STORE_NAME)) {
+        database.createObjectStore(STORE_NAME, { keyPath: 'id' });
+      }
+    };
+  });
+}
+
+// Auto-backup to IndexedDB every time progress changes
+async function autoBackupToIndexedDB() {
+  try {
+    const database = await initDB();
+    const transaction = database.transaction([STORE_NAME], 'readwrite');
+    const store = transaction.objectStore(STORE_NAME);
+    
+    const backup = {
+      id: 'auto_backup',
+      timestamp: new Date().toISOString(),
+      profile: getUserProfile(),
+      progress: getProgress(),
+      goals: getWeeklyGoals(),
+    };
+    
+    store.put(backup);
+    
+    // Also keep dated backups (last 7)
+    const dateKey = new Date().toISOString().split('T')[0];
+    store.put({ ...backup, id: `backup_${dateKey}` });
+    
+    localStorage.setItem(STORAGE_KEYS.LAST_BACKUP, backup.timestamp);
+  } catch (error) {
+    console.warn('Auto-backup failed:', error);
+  }
+}
+
+// Restore from IndexedDB backup
+export async function restoreFromIndexedDB() {
+  try {
+    const database = await initDB();
+    const transaction = database.transaction([STORE_NAME], 'readonly');
+    const store = transaction.objectStore(STORE_NAME);
+    
+    return new Promise((resolve, reject) => {
+      const request = store.get('auto_backup');
+      request.onsuccess = () => {
+        if (request.result) {
+          resolve(request.result);
+        } else {
+          resolve(null);
+        }
+      };
+      request.onerror = () => reject(request.error);
+    });
+  } catch (error) {
+    console.warn('Restore from IndexedDB failed:', error);
+    return null;
+  }
+}
+
+// Get all backups from IndexedDB
+export async function getAllBackups() {
+  try {
+    const database = await initDB();
+    const transaction = database.transaction([STORE_NAME], 'readonly');
+    const store = transaction.objectStore(STORE_NAME);
+    
+    return new Promise((resolve, reject) => {
+      const request = store.getAll();
+      request.onsuccess = () => {
+        const backups = request.result
+          .filter(b => b.id.startsWith('backup_'))
+          .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+        resolve(backups);
+      };
+      request.onerror = () => reject(request.error);
+    });
+  } catch (error) {
+    console.warn('Get backups failed:', error);
+    return [];
+  }
+}
+
+// Restore progress from a backup
+export function restoreFromBackup(backup) {
+  if (!backup) return false;
+  
+  try {
+    if (backup.profile) {
+      localStorage.setItem(STORAGE_KEYS.USER_PROFILE, JSON.stringify(backup.profile));
+    }
+    if (backup.progress) {
+      localStorage.setItem(STORAGE_KEYS.PROGRESS, JSON.stringify(backup.progress));
+    }
+    if (backup.goals) {
+      localStorage.setItem(STORAGE_KEYS.WEEKLY_GOALS, JSON.stringify(backup.goals));
+    }
+    return true;
+  } catch (error) {
+    console.error('Restore failed:', error);
+    return false;
+  }
+}
+
+// Check and recover from IndexedDB if localStorage is empty
+export async function checkAndRecoverProgress() {
+  const progress = localStorage.getItem(STORAGE_KEYS.PROGRESS);
+  
+  if (!progress) {
+    const backup = await restoreFromIndexedDB();
+    if (backup && backup.progress) {
+      const restored = restoreFromBackup(backup);
+      if (restored) {
+        console.log('Progress recovered from IndexedDB backup');
+        return { recovered: true, timestamp: backup.timestamp };
+      }
+    }
+  }
+  
+  return { recovered: false };
+}
 
 export function getUserProfile() {
   try {
@@ -21,6 +163,7 @@ export function setUserProfile(profile) {
     lastActive: new Date().toISOString(),
   };
   localStorage.setItem(STORAGE_KEYS.USER_PROFILE, JSON.stringify(fullProfile));
+  autoBackupToIndexedDB();
   return fullProfile;
 }
 
@@ -51,6 +194,7 @@ export function getProgress() {
 
 export function saveProgress(progress) {
   localStorage.setItem(STORAGE_KEYS.PROGRESS, JSON.stringify(progress));
+  autoBackupToIndexedDB();
 }
 
 export function toggleProblemComplete(patternId, problemName) {
@@ -237,12 +381,75 @@ export function exportProgress() {
   const goals = getWeeklyGoals();
   
   return {
-    version: 1,
+    version: 2,
     exportedAt: new Date().toISOString(),
     profile,
     progress,
     goals,
   };
+}
+
+// Export as downloadable file
+export function downloadProgressBackup() {
+  const data = exportProgress();
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  const date = new Date().toISOString().split('T')[0];
+  const profile = getUserProfile();
+  a.href = url;
+  a.download = `dsa-progress-${profile?.name?.replace(/\s+/g, '-') || 'backup'}-${date}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+// Copy progress to clipboard
+export async function copyProgressToClipboard() {
+  const data = exportProgress();
+  const jsonString = JSON.stringify(data, null, 2);
+  
+  try {
+    await navigator.clipboard.writeText(jsonString);
+    return { success: true };
+  } catch (error) {
+    return { success: false, error: error.message };
+  }
+}
+
+// Import from clipboard
+export async function importFromClipboard() {
+  try {
+    const text = await navigator.clipboard.readText();
+    return importMemberProgress(text);
+  } catch (error) {
+    return { success: false, error: 'Unable to read clipboard' };
+  }
+}
+
+// Import and restore own progress (not as team member)
+export function importOwnProgress(jsonData) {
+  try {
+    const data = typeof jsonData === 'string' ? JSON.parse(jsonData) : jsonData;
+    
+    if (!data.progress) {
+      throw new Error('Invalid progress file format');
+    }
+    
+    if (data.profile) {
+      localStorage.setItem(STORAGE_KEYS.USER_PROFILE, JSON.stringify(data.profile));
+    }
+    if (data.progress) {
+      localStorage.setItem(STORAGE_KEYS.PROGRESS, JSON.stringify(data.progress));
+    }
+    if (data.goals) {
+      localStorage.setItem(STORAGE_KEYS.WEEKLY_GOALS, JSON.stringify(data.goals));
+    }
+    
+    autoBackupToIndexedDB();
+    return { success: true };
+  } catch (error) {
+    return { success: false, error: error.message };
+  }
 }
 
 export function importMemberProgress(jsonData) {
@@ -375,3 +582,22 @@ export function getRecentActivity(limit = 10) {
   return activities.slice(0, limit);
 }
 
+export function getLastBackupTime() {
+  return localStorage.getItem(STORAGE_KEYS.LAST_BACKUP);
+}
+
+// Initialize auto-backup on page load
+if (typeof window !== 'undefined') {
+  // Initial backup
+  initDB().then(() => {
+    autoBackupToIndexedDB();
+  });
+  
+  // Backup on page unload
+  window.addEventListener('beforeunload', () => {
+    autoBackupToIndexedDB();
+  });
+  
+  // Check for recovery on load
+  checkAndRecoverProgress();
+}

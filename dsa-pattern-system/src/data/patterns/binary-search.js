@@ -9,7 +9,14 @@ export const binarySearch = {
 
 The classic application is searching in a sorted array, but the real power comes from "Binary Search on Answer" - when we can frame a problem as "find the minimum/maximum value that satisfies a condition." If we can write a function that checks if an answer works, and the answer space is monotonic (all values below threshold fail, all above pass or vice versa), we can binary search.
 
-Key requirement: The search space must have a monotonic property - once a condition becomes true/false, it stays that way.`,
+Key requirement: The search space must have a monotonic property - once a condition becomes true/false, it stays that way.
+
+COMMON PITFALLS TO AVOID:
+1. Infinite loops from wrong mid calculation or boundary updates
+2. Off-by-one errors with loop conditions (< vs <=)
+3. Integer overflow when calculating mid
+4. Choosing wrong initial boundaries
+5. Not excluding mid when shrinking boundaries`,
     
     keyInsight: 'If you can determine which half contains the answer, eliminate the other half. Works on any monotonic search space, not just arrays.',
     
@@ -480,43 +487,78 @@ def kth_smallest(matrix: List[List[int]], k: int) -> int:
 
   problems: [
     { name: 'Binary Search', difficulty: 'Easy', tags: ['classic'] },
+    { name: 'Sqrt(x)', difficulty: 'Easy', tags: ['math', 'answer space'] },
     { name: 'Search Insert Position', difficulty: 'Easy', tags: ['boundary', 'insert position'] },
     { name: 'First Bad Version', difficulty: 'Easy', tags: ['binary search on answer'] },
+    { name: 'Peak Index in a Mountain Array', difficulty: 'Easy', tags: ['peak finding'] },
+    { name: 'Count Negative Numbers in a Sorted Matrix', difficulty: 'Easy', tags: ['matrix'] },
     { name: 'Find First and Last Position of Element', difficulty: 'Medium', tags: ['boundary search'] },
     { name: 'Search in Rotated Sorted Array', difficulty: 'Medium', tags: ['rotated array'] },
+    { name: 'Search in Rotated Sorted Array II', difficulty: 'Medium', tags: ['rotated array', 'duplicates'] },
     { name: 'Find Minimum in Rotated Sorted Array', difficulty: 'Medium', tags: ['rotated array'] },
     { name: 'Find Peak Element', difficulty: 'Medium', tags: ['peak finding'] },
+    { name: 'Search a 2D Matrix', difficulty: 'Medium', tags: ['matrix'] },
+    { name: 'Search a 2D Matrix II', difficulty: 'Medium', tags: ['matrix', 'two pointers'] },
+    { name: 'Time Based Key-Value Store', difficulty: 'Medium', tags: ['binary search', 'design'] },
+    { name: 'Pow(x, n)', difficulty: 'Medium', tags: ['binary exponentiation'] },
+    { name: 'Divide Two Integers', difficulty: 'Medium', tags: ['bit manipulation', 'binary search'] },
     { name: 'Koko Eating Bananas', difficulty: 'Medium', tags: ['binary search on answer'] },
-    { name: 'Capacity To Ship Packages', difficulty: 'Medium', tags: ['binary search on answer'] },
+    { name: 'Capacity To Ship Packages Within D Days', difficulty: 'Medium', tags: ['binary search on answer'] },
+    { name: 'Minimum Limit of Balls in a Bag', difficulty: 'Medium', tags: ['binary search on answer'] },
+    { name: 'Magnetic Force Between Two Balls', difficulty: 'Medium', tags: ['binary search on answer'] },
+    { name: 'Minimized Maximum of Products Distributed to Any Store', difficulty: 'Medium', tags: ['binary search on answer'] },
     { name: 'Kth Smallest Element in Sorted Matrix', difficulty: 'Medium', tags: ['kth element', 'matrix'] },
     { name: 'Median of Two Sorted Arrays', difficulty: 'Hard', tags: ['binary search', 'divide conquer'] },
-    { name: 'Split Array Largest Sum', difficulty: 'Hard', tags: ['binary search on answer'] }
+    { name: 'Split Array Largest Sum', difficulty: 'Hard', tags: ['binary search on answer'] },
+    { name: 'Count of Smaller Numbers After Self', difficulty: 'Hard', tags: ['merge sort', 'binary search'] },
+    { name: 'Max Sum of Rectangle No Larger Than K', difficulty: 'Hard', tags: ['prefix sum', 'binary search'] },
+    { name: 'Shortest Subarray with Sum at Least K', difficulty: 'Hard', tags: ['deque', 'prefix sum'] }
   ],
 
   mistakes: [
     {
       trap: 'Integer overflow when calculating mid: (left + right) / 2',
-      fix: 'Use mid = left + (right - left) / 2 to avoid overflow.'
+      fix: 'Use mid = left + (right - left) / 2 to avoid overflow. Or use unsigned right shift: (left + right) >>> 1.'
     },
     {
       trap: 'Infinite loop due to wrong boundary update (mid vs mid+1/mid-1)',
-      fix: 'For left < right: use right = mid when condition true, left = mid + 1 when false. For left <= right: use mid-1 and mid+1.'
+      fix: 'For left < right: use right = mid when condition true, left = mid + 1 when false. For left <= right: always use mid-1 and mid+1.'
+    },
+    {
+      trap: 'Wrong mid calculation causing infinite loop with 2 elements',
+      fix: 'If using left = mid (not mid+1), must use upper mid: mid = left + (right - left + 1) / 2. Otherwise use lower mid.'
     },
     {
       trap: 'Off-by-one error: should condition be left <= right or left < right?',
-      fix: 'Use left <= right when searching for exact value. Use left < right when searching for boundary/minimum.'
+      fix: 'Use left <= right when searching for exact value (return -1 if not found). Use left < right for boundaries (left always valid at end).'
+    },
+    {
+      trap: 'Wrong initial boundary - not including all possible answers',
+      fix: 'For insert position, use right = nums.length (not length-1) since we can insert at end. Think: what are ALL possible answers?'
     },
     {
       trap: 'In rotated array, not handling duplicates correctly',
-      fix: 'When nums[left] == nums[mid] == nums[right], skip duplicates: left++; right--;'
+      fix: 'When nums[left] == nums[mid] == nums[right], can\'t determine which side is sorted. Must do left++; right--;'
     },
     {
       trap: 'Binary search on answer: wrong search space bounds',
-      fix: 'Carefully determine minimum and maximum possible answers. For rates: min=1. For sums: min=max(arr).'
+      fix: 'Carefully determine minimum and maximum possible answers. For rates: min=1. For sums: min=max(arr), max=sum(arr).'
+    },
+    {
+      trap: 'Not excluding mid when shrinking boundaries',
+      fix: 'Use a logic that can confidently exclude mid. If target < nums[mid], do right = mid - 1 (exclude mid). Otherwise left = mid.'
     }
   ],
 
   variations: [
+    {
+      name: 'Learning Phases',
+      description: 'Phase 1: Basic (ceil/floor, first/last). Phase 2: Math (sqrt, peak). Phase 3: Rotated arrays. Phase 4: Bitonic. Phase 5: Advanced answer space.'
+    },
+    {
+      name: 'Bug-Free Binary Search Pattern',
+      description: '1) Include ALL possible answers in initial bounds 2) Avoid overflow in mid 3) Shrink with logic that excludes mid 4) Use left < right to avoid infinite loop 5) Test with 2 elements.'
+    },
     {
       name: 'Ternary Search',
       description: 'Divide into three parts - useful for unimodal functions (one peak/valley). Rarely needed.'
@@ -526,8 +568,8 @@ def kth_smallest(matrix: List[List[int]], k: int) -> int:
       description: 'Find range by doubling, then binary search. Good for unbounded/infinite arrays.'
     },
     {
-      name: 'Interpolation Search',
-      description: 'Estimate position based on value distribution. O(log log n) for uniform data, but O(n) worst case.'
+      name: 'Binary Exponentiation',
+      description: 'Compute x^n in O(log n) by repeatedly squaring. If n is even: x^n = (x^2)^(n/2). If odd: x^n = x × x^(n-1).'
     }
   ]
 };

@@ -17,8 +17,16 @@ The key optimization comes from the fact that consecutive windows share most ele
       'Finding max/min/average of contiguous subarrays of size k',
       'Longest/shortest substring with certain constraints',
       'String permutation or anagram problems',
-      'Subarray with given sum or at most k distinct elements',
+      'Subarray with given sum or at most k distinct elements (positive numbers only)',
       'Any problem asking for contiguous sequence optimization'
+    ],
+
+    whenNotToUse: [
+      'Sliding window works by reusing information as the window moves. For this to work, two rules must hold:',
+      '1. If a wider window is valid, then any narrower window within it must also be valid',
+      '2. If a narrower window is invalid, then any wider window containing it must also be invalid',
+      '',
+      'Example where it FAILS: Subarray sum with negative numbers. Arrays with negative values can violate both rules, making it impossible to safely skip cases.'
     ],
     
     complexity: {
