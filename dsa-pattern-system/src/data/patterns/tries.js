@@ -3,6 +3,83 @@ export const tries = {
   title: 'Tries',
   icon: '🌲',
   difficulty: 'Medium',
+
+  // 🌟 BEGINNER-FRIENDLY INTRODUCTION
+  introduction: {
+    realWorldAnalogy: `Think of a phone's autocomplete 📱:
+
+As you type "hel", it suggests:
+- hello
+- help  
+- helicopter
+
+How does it instantly find all words starting with "hel"? It uses a **Trie**!
+
+Each letter you type moves down a branch of the tree. All words sharing that prefix are in the same subtree. O(L) lookup regardless of dictionary size!`,
+
+    simpleExplanation: `A Trie (prefix tree) stores strings character by character. Each node represents a character, and paths from root represent words/prefixes.
+
+**Structure:**
+\`\`\`
+        root
+       /    \\
+      h      b
+     /        \\
+    e          a
+   / \\          \\
+  l   y          t
+ / \\
+l   p
+o   
+\`\`\`
+Words: "hello", "help", "hey", "bat"
+
+**Key operations:**
+• **Insert**: Walk/create path for each character
+• **Search**: Walk path, check isEnd flag
+• **StartsWith**: Walk path, return if path exists`,
+
+    visualSteps: [
+      { step: 1, title: 'Create Node Class', description: 'Each node has children and isEnd flag', visual: 'TrieNode: children[26], isEnd=false' },
+      { step: 2, title: 'Insert Word', description: 'Walk/create path for each character', visual: 'for char in word: node = node.children[char]' },
+      { step: 3, title: 'Mark Word End', description: 'Set isEnd=true at last character', visual: 'node.isEnd = true' },
+      { step: 4, title: 'Search Exact', description: 'Walk path, return node.isEnd', visual: 'search("app") → walk a->p->p, return isEnd' },
+      { step: 5, title: 'Search Prefix', description: 'Walk path, return if path exists', visual: 'startsWith("app") → path exists? true!' },
+    ],
+
+    keyTakeaway: '💡 Tries enable O(L) string operations regardless of dictionary size. Perfect for autocomplete and prefix matching!',
+  },
+
+  // 🎯 PATTERN RECOGNITION SIGNALS
+  recognitionSignals: {
+    keyPhrases: [
+      'prefix',
+      'autocomplete',
+      'word dictionary',
+      'starts with',
+      'word search',
+      'spell checker',
+      'search suggestions',
+    ],
+    problemCharacteristics: [
+      'Multiple words to store/search',
+      'Prefix-based queries',
+      'Need efficient string lookup',
+      'Building autocomplete or spell checker',
+    ],
+    notSuitableWhen: [
+      'Only need exact match (use HashSet)',
+      'Single string search (use built-in methods)',
+      'Space is very limited (Tries can use more memory)',
+    ],
+  },
+
+  // 🔗 RELATED PATTERNS
+  relatedPatterns: [
+    { id: 'bfs-dfs', relationship: 'Trie + DFS for Word Search II (grid word search)' },
+    { id: 'trees', relationship: 'Trie is a specialized tree structure' },
+    { id: 'arrays-strings', relationship: 'Trie is an efficient string data structure' },
+  ],
   
   theory: {
     overview: `A Trie (prefix tree) stores strings character by character. Each node represents a prefix, and paths from root represent words. This enables O(L) lookup where L is word length, regardless of dictionary size.

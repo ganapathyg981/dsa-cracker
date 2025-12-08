@@ -1,24 +1,97 @@
-import React, { useState } from 'react';
-import { Lock, ChevronRight } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Lock, ChevronRight, Menu, X, ChevronDown } from 'lucide-react';
 import PatternDetail from './PatternDetail';
 import { topics, getPattern } from '../data/patterns';
 
-const PatternExplorer = () => {
-  const [selectedPatternId, setSelectedPatternId] = useState('two-pointers');
+const PatternExplorer = ({ onMobilePatternSelectorToggle }) => {
+  // Check for selected pattern from Learning Path navigation
+  const getInitialPattern = () => {
+    const storedId = sessionStorage.getItem('selectedPatternId');
+    if (storedId) {
+      sessionStorage.removeItem('selectedPatternId'); // Clear after use
+      return storedId;
+    }
+    return 'arrays-strings'; // Default to Arrays & Strings for beginners
+  };
+
+  const [selectedPatternId, setSelectedPatternId] = useState(getInitialPattern);
   const [searchQuery, setSearchQuery] = useState('');
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  
+  // Store current pattern in session storage for mobile nav
+  React.useEffect(() => {
+    sessionStorage.setItem('currentPatternId', selectedPatternId);
+  }, [selectedPatternId]);
+
+  // Listen for pattern selection from other components
+  useEffect(() => {
+    const checkForPatternSelection = () => {
+      const storedId = sessionStorage.getItem('selectedPatternId');
+      if (storedId) {
+        setSelectedPatternId(storedId);
+        sessionStorage.removeItem('selectedPatternId');
+      }
+    };
+    
+    window.addEventListener('storage', checkForPatternSelection);
+    return () => window.removeEventListener('storage', checkForPatternSelection);
+  }, []);
 
   const filteredTopics = topics.filter(topic =>
     topic.label.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   const selectedPattern = getPattern(selectedPatternId);
+  const currentTopic = topics.find(t => t.id === selectedPatternId);
+
+  const handlePatternSelect = (patternId) => {
+    setSelectedPatternId(patternId);
+    setSidebarOpen(false);
+    sessionStorage.setItem('currentPatternId', patternId);
+    // Force re-render of parent to update mobile nav
+    if (onMobilePatternSelectorToggle) {
+      onMobilePatternSelectorToggle(false);
+    }
+  };
+  
+  // Open sidebar when mobile pattern selector is clicked
+  React.useEffect(() => {
+    const handleMobileOpen = () => {
+      setSidebarOpen(true);
+    };
+    window.addEventListener('openMobilePatternSelector', handleMobileOpen);
+    return () => window.removeEventListener('openMobilePatternSelector', handleMobileOpen);
+  }, []);
 
   return (
-    <div className="flex h-[calc(100vh-57px)]">
+    <div className="flex h-[calc(100vh-57px)] relative">
+      {/* Mobile Overlay */}
+      {sidebarOpen && (
+        <div 
+          className="lg:hidden fixed inset-0 bg-black/50 z-30"
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
+
       {/* Sidebar */}
-      <aside className="w-72 bg-gray-50 border-r border-gray-200 flex flex-col">
+      <aside className={`
+        fixed lg:relative inset-y-0 left-0 z-40 w-72 bg-gray-50 border-r border-gray-200 flex flex-col
+        transform transition-transform duration-300 ease-in-out
+        ${sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
+      `}>
+        {/* Mobile Close Button */}
+        <div className="lg:hidden flex items-center justify-between p-3 border-b border-gray-200">
+          <span className="font-semibold text-gray-800">Patterns</span>
+          <button
+            onClick={() => setSidebarOpen(false)}
+            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+          >
+            <X size={20} className="text-gray-600" />
+          </button>
+        </div>
+
         {/* Search */}
-        <div className="p-4 border-b border-gray-200">
+        <div className="p-3 sm:p-4 border-b border-gray-200">
           <input
             type="text"
             placeholder="Search patterns..."
@@ -38,7 +111,7 @@ const PatternExplorer = () => {
               return (
                 <li key={topic.id}>
                   <button
-                    onClick={() => isAvailable && setSelectedPatternId(topic.id)}
+                    onClick={() => isAvailable && handlePatternSelect(topic.id)}
                     disabled={!isAvailable}
                     className={`
                       w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-left text-sm transition-all
@@ -65,7 +138,7 @@ const PatternExplorer = () => {
         </nav>
 
         {/* Stats */}
-        <div className="p-4 border-t border-gray-200 bg-white">
+        <div className="p-3 sm:p-4 border-t border-gray-200 bg-white">
           <div className="text-xs text-gray-500">
             <span className="font-medium text-gray-700">
               {topics.filter(t => t.available).length}

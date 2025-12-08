@@ -23,24 +23,24 @@ const CodeTemplate = ({ template, index }) => {
   return (
     <div className="border border-gray-200 rounded-xl overflow-hidden shadow-sm bg-white">
       {/* Header */}
-      <div className="bg-gradient-to-r from-slate-800 to-slate-900 px-5 py-4">
-        <div className="flex items-center justify-between">
-          <div className="flex-1">
-            <h3 className="text-lg font-semibold text-white flex items-center gap-2">
-              <span className="w-7 h-7 bg-blue-500 rounded-lg flex items-center justify-center text-sm font-bold">
+      <div className="bg-gradient-to-r from-slate-800 to-slate-900 px-3 sm:px-5 py-3 sm:py-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-4">
+          <div className="flex-1 min-w-0">
+            <h3 className="text-sm sm:text-lg font-semibold text-white flex items-center gap-2">
+              <span className="w-6 h-6 sm:w-7 sm:h-7 bg-blue-500 rounded-lg flex items-center justify-center text-xs sm:text-sm font-bold flex-shrink-0">
                 {index + 1}
               </span>
-              {template.name}
+              <span className="truncate">{template.name}</span>
             </h3>
-            <p className="text-slate-400 text-sm mt-1">{template.description}</p>
+            <p className="text-slate-400 text-xs sm:text-sm mt-1 line-clamp-2">{template.description}</p>
           </div>
-          <div className="flex items-center gap-3 text-xs ml-4">
-            <span className="flex items-center gap-1.5 px-2.5 py-1.5 bg-emerald-500/20 text-emerald-400 rounded-lg">
-              <Clock size={12} />
+          <div className="flex items-center gap-2 sm:gap-3 text-[10px] sm:text-xs flex-shrink-0">
+            <span className="flex items-center gap-1 sm:gap-1.5 px-2 sm:px-2.5 py-1 sm:py-1.5 bg-emerald-500/20 text-emerald-400 rounded-lg">
+              <Clock size={10} className="sm:w-3 sm:h-3" />
               {template.timeComplexity}
             </span>
-            <span className="flex items-center gap-1.5 px-2.5 py-1.5 bg-purple-500/20 text-purple-400 rounded-lg">
-              <Database size={12} />
+            <span className="flex items-center gap-1 sm:gap-1.5 px-2 sm:px-2.5 py-1 sm:py-1.5 bg-purple-500/20 text-purple-400 rounded-lg">
+              <Database size={10} className="sm:w-3 sm:h-3" />
               {template.spaceComplexity}
             </span>
           </div>
@@ -48,11 +48,11 @@ const CodeTemplate = ({ template, index }) => {
       </div>
 
       {/* Language Toggle */}
-      <div className="flex items-center justify-between px-4 py-2 bg-slate-800 border-b border-slate-700">
+      <div className="flex items-center justify-between px-3 sm:px-4 py-2 bg-slate-800 border-b border-slate-700">
         <div className="flex gap-1">
           <button
             onClick={() => setActiveLanguage('java')}
-            className={`px-3 py-1.5 text-sm font-medium rounded-lg transition-all ${
+            className={`px-2 sm:px-3 py-1 sm:py-1.5 text-xs sm:text-sm font-medium rounded-lg transition-all ${
               activeLanguage === 'java'
                 ? 'bg-orange-500 text-white'
                 : 'text-slate-400 hover:text-white hover:bg-slate-700'
@@ -62,7 +62,7 @@ const CodeTemplate = ({ template, index }) => {
           </button>
           <button
             onClick={() => setActiveLanguage('python')}
-            className={`px-3 py-1.5 text-sm font-medium rounded-lg transition-all ${
+            className={`px-2 sm:px-3 py-1 sm:py-1.5 text-xs sm:text-sm font-medium rounded-lg transition-all ${
               activeLanguage === 'python'
                 ? 'bg-blue-500 text-white'
                 : 'text-slate-400 hover:text-white hover:bg-slate-700'
@@ -73,18 +73,18 @@ const CodeTemplate = ({ template, index }) => {
         </div>
         <button
           onClick={() => copyToClipboard(getCode(), activeLanguage)}
-          className="flex items-center gap-1.5 px-3 py-1.5 text-slate-400 hover:text-white hover:bg-slate-700 rounded-lg transition-all text-sm"
+          className="flex items-center gap-1 sm:gap-1.5 px-2 sm:px-3 py-1 sm:py-1.5 text-slate-400 hover:text-white hover:bg-slate-700 rounded-lg transition-all text-xs sm:text-sm"
           title={`Copy ${activeLanguage === 'java' ? 'Java' : 'Python'} code`}
         >
           {copiedCode === activeLanguage ? (
             <>
-              <Check size={14} className="text-green-400" />
-              <span className="text-green-400">Copied!</span>
+              <Check size={12} className="sm:w-3.5 sm:h-3.5 text-green-400" />
+              <span className="text-green-400 hidden xs:inline">Copied!</span>
             </>
           ) : (
             <>
-              <Copy size={14} />
-              <span>Copy</span>
+              <Copy size={12} className="sm:w-3.5 sm:h-3.5" />
+              <span className="hidden xs:inline">Copy</span>
             </>
           )}
         </button>

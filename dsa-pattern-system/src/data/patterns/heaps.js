@@ -3,6 +3,75 @@ export const heaps = {
   title: 'Heaps',
   icon: '⛰️',
   difficulty: 'Medium',
+
+  // 🌟 BEGINNER-FRIENDLY INTRODUCTION
+  introduction: {
+    realWorldAnalogy: `Imagine a hospital emergency room 🏥:
+    
+Patients don't get treated in order of arrival. The **most critical** patient (highest priority) is treated first. That's exactly what a heap does!
+
+A **Max Heap** = VIP line (highest value always at front)
+A **Min Heap** = Express lane (smallest value always at front)
+
+You can peek at who's next (O(1)), add a patient (O(log n)), or treat the first patient (O(log n)).`,
+
+    simpleExplanation: `A Heap (Priority Queue) is a special tree where:
+• **Min Heap**: Parent ≤ Children (smallest on top)
+• **Max Heap**: Parent ≥ Children (largest on top)
+
+**Key operations:**
+• **peek()** - See the top element: O(1)
+• **push()** - Add element: O(log n)
+• **pop()** - Remove top: O(log n)
+
+**The "Top K" trick:**
+• Want K largest? Use MIN heap of size K
+• Want K smallest? Use MAX heap of size K
+
+Why? The smallest of the K largest floats to the top!`,
+
+    visualSteps: [
+      { step: 1, title: 'Choose Heap Type', description: 'Min heap for smallest, Max heap for largest', visual: 'K largest → Min Heap size K' },
+      { step: 2, title: 'Initialize', description: 'Create PriorityQueue in your language', visual: 'Java: new PriorityQueue<>() // min heap' },
+      { step: 3, title: 'Add Elements', description: 'Push elements, heap maintains order', visual: 'heap.offer(5); heap.offer(3); // top is 3' },
+      { step: 4, title: 'Maintain Size K', description: 'For Top K, pop if size exceeds K', visual: 'if (heap.size() > k) heap.poll();' },
+      { step: 5, title: 'Extract Answer', description: 'Top of heap is your answer', visual: 'return heap.peek(); // Kth largest' },
+    ],
+
+    keyTakeaway: '💡 For "K largest", use MIN heap size K. For "K smallest", use MAX heap size K. Counter-intuitive but it works!',
+  },
+
+  // 🎯 PATTERN RECOGNITION SIGNALS
+  recognitionSignals: {
+    keyPhrases: [
+      'kth largest',
+      'kth smallest',
+      'top k',
+      'running median',
+      'merge k sorted',
+      'priority',
+      'schedule tasks',
+    ],
+    problemCharacteristics: [
+      'Need to track K largest or smallest elements',
+      'Streaming data - elements arrive one by one',
+      'Need quick access to min/max',
+      'Merging multiple sorted sequences',
+      'Task scheduling by priority',
+    ],
+    notSuitableWhen: [
+      'Need all elements sorted (use sorting)',
+      'Need random access by index (use array)',
+      'Only need final min/max once (just scan array)',
+    ],
+  },
+
+  // 🔗 RELATED PATTERNS
+  relatedPatterns: [
+    { id: 'binary-search', relationship: 'Both provide efficient access to ordered data' },
+    { id: 'graphs', relationship: 'Heaps power Dijkstra\'s shortest path algorithm' },
+    { id: 'two-pointers', relationship: 'Two heaps pattern for running median' },
+  ],
   
   theory: {
     overview: `Heaps (Priority Queues) efficiently maintain min or max element. Operations: insert O(log n), extract-min/max O(log n), peek O(1).

@@ -180,26 +180,26 @@ const Dashboard = () => {
 
   return (
     <div className="min-h-[calc(100vh-57px)] bg-gradient-to-br from-slate-50 via-violet-50 to-indigo-50">
-      <div className="max-w-7xl mx-auto px-6 py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4 sm:py-8">
         {/* Header with motivation */}
-        <div className="flex items-center justify-between mb-6">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
           <div>
-            <h1 className="text-3xl font-bold text-gray-800 flex items-center gap-2">
+            <h1 className="text-xl sm:text-3xl font-bold text-gray-800 flex items-center gap-2">
               Welcome back, {profile?.name || 'Student'}!
               {stats.streak.currentStreak > 0 && (
-                <span className="text-2xl animate-bounce-slow">{streakMilestone?.icon || '✨'}</span>
+                <span className="text-xl sm:text-2xl animate-bounce-slow">{streakMilestone?.icon || '✨'}</span>
               )}
             </h1>
-            <p className="text-gray-500 mt-1 flex items-center gap-2">
-              <Sparkles size={16} className="text-amber-500" />
-              {getRandomMotivation()}
+            <p className="text-gray-500 mt-1 flex items-center gap-2 text-sm sm:text-base">
+              <Sparkles size={16} className="text-amber-500 flex-shrink-0" />
+              <span className="truncate">{getRandomMotivation()}</span>
             </p>
           </div>
           
-          <div className="flex gap-3">
+          <div className="flex gap-2 sm:gap-3 flex-wrap sm:flex-nowrap">
             {/* Backup Status */}
             {lastBackup && (
-              <div className="flex items-center gap-2 px-3 py-2 bg-emerald-50 border border-emerald-200 rounded-xl text-emerald-700 text-sm">
+              <div className="hidden sm:flex items-center gap-2 px-3 py-2 bg-emerald-50 border border-emerald-200 rounded-xl text-emerald-700 text-sm">
                 <Shield size={16} />
                 <span>Auto-saved</span>
               </div>
@@ -209,23 +209,24 @@ const Dashboard = () => {
                 setShowBackupModal(true);
                 loadBackups();
               }}
-              className="flex items-center gap-2 px-4 py-2.5 bg-white border border-gray-200 rounded-xl text-gray-700 font-medium hover:bg-gray-50 hover:border-gray-300 transition-all shadow-sm hover:shadow-md"
+              className="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 sm:py-2.5 bg-white border border-gray-200 rounded-xl text-gray-700 font-medium hover:bg-gray-50 hover:border-gray-300 transition-all shadow-sm hover:shadow-md text-sm sm:text-base"
             >
-              <Shield size={18} />
-              Backup
+              <Shield size={16} className="sm:w-[18px] sm:h-[18px]" />
+              <span className="hidden sm:inline">Backup</span>
             </button>
             <button
               onClick={() => setShowImportModal(true)}
-              className="flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-violet-600 to-indigo-600 text-white rounded-xl font-medium hover:from-violet-700 hover:to-indigo-700 transition-all shadow-lg shadow-violet-200 hover:shadow-xl hover:-translate-y-0.5"
+              className="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 sm:py-2.5 bg-gradient-to-r from-violet-600 to-indigo-600 text-white rounded-xl font-medium hover:from-violet-700 hover:to-indigo-700 transition-all shadow-lg shadow-violet-200 hover:shadow-xl hover:-translate-y-0.5 text-sm sm:text-base"
             >
-              <Users size={18} />
-              Study Group
+              <Users size={16} className="sm:w-[18px] sm:h-[18px]" />
+              <span className="hidden xs:inline">Study Group</span>
+              <span className="xs:hidden">Group</span>
             </button>
           </div>
         </div>
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-4 gap-4 mb-6">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6">
           <StatCard
             icon={CheckCircle2}
             label="Problems Solved"
@@ -267,20 +268,20 @@ const Dashboard = () => {
         </div>
 
         {/* Tab Navigation */}
-        <div className="flex gap-2 mb-6">
+        <div className="flex gap-2 mb-6 overflow-x-auto pb-1">
           {tabs.map(tab => {
             const Icon = tab.icon;
             return (
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`flex items-center gap-2 px-4 py-2.5 rounded-xl font-medium transition-all ${
+                className={`flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 sm:py-2.5 rounded-xl font-medium transition-all whitespace-nowrap text-sm sm:text-base ${
                   activeTab === tab.id
                     ? 'bg-white text-violet-700 shadow-md'
                     : 'text-gray-600 hover:bg-white/50'
                 }`}
               >
-                <Icon size={18} />
+                <Icon size={16} className="sm:w-[18px] sm:h-[18px]" />
                 {tab.label}
               </button>
             );
@@ -289,13 +290,13 @@ const Dashboard = () => {
 
         {/* Content */}
         {activeTab === 'overview' && (
-          <div className="grid grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
             {/* Quick Wins Section */}
-            <div className="bg-gradient-to-br from-emerald-50 to-green-50 rounded-2xl p-5 shadow-sm border border-emerald-100 col-span-2">
-              <h3 className="font-semibold text-emerald-800 mb-3 flex items-center gap-2">
-                <Zap size={18} className="text-emerald-600" />
+            <div className="bg-gradient-to-br from-emerald-50 to-green-50 rounded-2xl p-4 sm:p-5 shadow-sm border border-emerald-100 lg:col-span-2">
+              <h3 className="font-semibold text-emerald-800 mb-3 flex flex-wrap items-center gap-2 text-sm sm:text-base">
+                <Zap size={16} className="sm:w-[18px] sm:h-[18px] text-emerald-600" />
                 Quick Wins - Easiest Unsolved
-                <span className="text-xs bg-emerald-200 text-emerald-700 px-2 py-0.5 rounded-full ml-2">
+                <span className="text-xs bg-emerald-200 text-emerald-700 px-2 py-0.5 rounded-full">
                   ~5 min each
                 </span>
               </h3>
@@ -330,8 +331,8 @@ const Dashboard = () => {
             </div>
 
             {/* Difficulty Breakdown */}
-            <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
-              <h3 className="font-semibold text-gray-800 mb-4">Difficulty Breakdown</h3>
+            <div className="bg-white rounded-2xl p-4 sm:p-5 shadow-sm border border-gray-100">
+              <h3 className="font-semibold text-gray-800 mb-4 text-sm sm:text-base">Difficulty Breakdown</h3>
               <div className="space-y-4">
                 <DifficultyBar label="Easy" completed={stats.easyCompleted} color="green" emoji="🟢" />
                 <DifficultyBar label="Medium" completed={stats.mediumCompleted} color="yellow" emoji="🟡" />
@@ -351,23 +352,23 @@ const Dashboard = () => {
             </div>
 
             {/* Recent Activity */}
-            <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 col-span-3">
-              <h3 className="font-semibold text-gray-800 mb-4 flex items-center gap-2">
-                <Clock size={18} className="text-gray-500" />
+            <div className="bg-white rounded-2xl p-4 sm:p-5 shadow-sm border border-gray-100 lg:col-span-3">
+              <h3 className="font-semibold text-gray-800 mb-4 flex items-center gap-2 text-sm sm:text-base">
+                <Clock size={16} className="sm:w-[18px] sm:h-[18px] text-gray-500" />
                 Recent Activity
               </h3>
               {recentActivity.length > 0 ? (
-                <div className="flex gap-3 overflow-x-auto pb-2">
+                <div className="flex gap-3 overflow-x-auto pb-2 -mx-4 px-4 sm:mx-0 sm:px-0">
                   {recentActivity.map((activity, idx) => (
                     <div 
                       key={idx} 
-                      className="flex-shrink-0 flex items-center gap-3 p-3 bg-gradient-to-r from-gray-50 to-slate-50 rounded-xl border border-gray-100 min-w-[280px] hover:shadow-md transition-all"
+                      className="flex-shrink-0 flex items-center gap-2 sm:gap-3 p-2.5 sm:p-3 bg-gradient-to-r from-gray-50 to-slate-50 rounded-xl border border-gray-100 min-w-[240px] sm:min-w-[280px] hover:shadow-md transition-all"
                     >
-                      <div className="w-10 h-10 bg-emerald-100 rounded-lg flex items-center justify-center">
-                        <CheckCircle2 size={20} className="text-emerald-600" />
+                      <div className="w-8 h-8 sm:w-10 sm:h-10 bg-emerald-100 rounded-lg flex items-center justify-center">
+                        <CheckCircle2 size={16} className="sm:w-5 sm:h-5 text-emerald-600" />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="font-medium text-gray-800 truncate">{activity.problemName}</p>
+                        <p className="font-medium text-gray-800 truncate text-sm sm:text-base">{activity.problemName}</p>
                         <p className="text-xs text-gray-500">{patterns[activity.patternId]?.title}</p>
                       </div>
                       <span className="text-xs text-gray-400 whitespace-nowrap">
@@ -388,9 +389,9 @@ const Dashboard = () => {
         )}
 
         {activeTab === 'patterns' && (
-          <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-            <h3 className="font-semibold text-gray-800 mb-4">Pattern Progress</h3>
-            <div className="grid grid-cols-2 gap-4">
+          <div className="bg-white rounded-2xl p-4 sm:p-6 shadow-sm border border-gray-100">
+            <h3 className="font-semibold text-gray-800 mb-4 text-sm sm:text-base">Pattern Progress</h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
               {topics.filter(t => t.available).map((topic, idx) => {
                 const patternStat = stats.patternStats[topic.id];
                 return (
@@ -410,11 +411,11 @@ const Dashboard = () => {
         )}
 
         {activeTab === 'leaderboard' && (
-          <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-            <div className="flex items-center justify-between mb-6">
-              <h3 className="font-semibold text-gray-800">Study Group Leaderboard</h3>
+          <div className="bg-white rounded-2xl p-4 sm:p-6 shadow-sm border border-gray-100">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4 sm:mb-6">
+              <h3 className="font-semibold text-gray-800 text-sm sm:text-base">Study Group Leaderboard</h3>
               {Object.keys(importedMembers).length > 0 && (
-                <span className="text-sm text-gray-500">
+                <span className="text-xs sm:text-sm text-gray-500">
                   {Object.keys(importedMembers).length} member{Object.keys(importedMembers).length !== 1 ? 's' : ''} imported
                 </span>
               )}
@@ -444,7 +445,7 @@ const Dashboard = () => {
 
       {/* Import Modal (Study Group) */}
       {showImportModal && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fade-in">
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-[60] p-4 animate-fade-in">
           <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 animate-scale-in">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-xl font-bold text-gray-800">Study Group</h3>
@@ -497,8 +498,8 @@ const Dashboard = () => {
 
       {/* Backup & Restore Modal */}
       {showBackupModal && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fade-in">
-          <div className="bg-white rounded-2xl shadow-2xl max-w-lg w-full p-6 animate-scale-in">
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-[60] p-3 sm:p-4 animate-fade-in">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-lg w-full p-4 sm:p-6 animate-scale-in max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-xl font-bold text-gray-800 flex items-center gap-2">
                 <Shield size={24} className="text-emerald-500" />
@@ -547,19 +548,19 @@ const Dashboard = () => {
 
             <div className="space-y-3">
               {/* Export options */}
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3">
                 <button
                   onClick={handleExport}
-                  className="flex items-center justify-center gap-2 py-3 px-4 bg-violet-100 text-violet-700 rounded-xl font-medium hover:bg-violet-200 transition-all"
+                  className="flex items-center justify-center gap-2 py-2.5 sm:py-3 px-3 sm:px-4 bg-violet-100 text-violet-700 rounded-xl font-medium hover:bg-violet-200 transition-all text-sm sm:text-base"
                 >
-                  <Download size={18} />
+                  <Download size={16} className="sm:w-[18px] sm:h-[18px]" />
                   Download Backup
                 </button>
                 <button
                   onClick={handleCopyToClipboard}
-                  className="flex items-center justify-center gap-2 py-3 px-4 bg-blue-100 text-blue-700 rounded-xl font-medium hover:bg-blue-200 transition-all"
+                  className="flex items-center justify-center gap-2 py-2.5 sm:py-3 px-3 sm:px-4 bg-blue-100 text-blue-700 rounded-xl font-medium hover:bg-blue-200 transition-all text-sm sm:text-base"
                 >
-                  {copiedToClipboard ? <Check size={18} /> : <Copy size={18} />}
+                  {copiedToClipboard ? <Check size={16} className="sm:w-[18px] sm:h-[18px]" /> : <Copy size={16} className="sm:w-[18px] sm:h-[18px]" />}
                   {copiedToClipboard ? 'Copied!' : 'Copy to Clipboard'}
                 </button>
               </div>
@@ -637,24 +638,24 @@ const StatCard = ({ icon: Icon, label, value, subtext, color, onEdit, progress, 
   };
 
   return (
-    <div className={`bg-white rounded-2xl p-5 shadow-sm border border-gray-100 relative group hover:shadow-md transition-all ${highlight ? 'ring-2 ring-orange-200' : ''}`}>
+    <div className={`bg-white rounded-xl sm:rounded-2xl p-3 sm:p-5 shadow-sm border border-gray-100 relative group hover:shadow-md transition-all ${highlight ? 'ring-2 ring-orange-200' : ''}`}>
       {onEdit && (
         <button
           onClick={onEdit}
-          className="absolute top-3 right-3 p-1.5 rounded-lg opacity-0 group-hover:opacity-100 hover:bg-gray-100 transition-all"
+          className="absolute top-2 right-2 sm:top-3 sm:right-3 p-1 sm:p-1.5 rounded-lg opacity-0 group-hover:opacity-100 hover:bg-gray-100 transition-all"
           title="Edit goal"
         >
-          <ChevronRight size={16} className="text-gray-400" />
+          <ChevronRight size={14} className="sm:w-4 sm:h-4 text-gray-400" />
         </button>
       )}
-      <div className={`w-12 h-12 ${colorClasses[color]} rounded-xl flex items-center justify-center mb-3`}>
-        <Icon size={24} />
+      <div className={`w-10 h-10 sm:w-12 sm:h-12 ${colorClasses[color]} rounded-lg sm:rounded-xl flex items-center justify-center mb-2 sm:mb-3`}>
+        <Icon size={20} className="sm:w-6 sm:h-6" />
       </div>
-      <p className="text-sm text-gray-500 mb-1">{label}</p>
-      <p className="text-2xl font-bold text-gray-800">{value}</p>
-      <p className="text-sm text-gray-400 mt-1">{subtext}</p>
+      <p className="text-xs sm:text-sm text-gray-500 mb-0.5 sm:mb-1">{label}</p>
+      <p className="text-lg sm:text-2xl font-bold text-gray-800">{value}</p>
+      <p className="text-xs sm:text-sm text-gray-400 mt-0.5 sm:mt-1 truncate">{subtext}</p>
       {progress !== undefined && (
-        <div className="mt-3 h-1.5 bg-gray-100 rounded-full overflow-hidden">
+        <div className="mt-2 sm:mt-3 h-1 sm:h-1.5 bg-gray-100 rounded-full overflow-hidden">
           <div 
             className={`h-full ${progressColors[color]} rounded-full transition-all duration-500`}
             style={{ width: `${Math.min(progress, 100)}%` }}
@@ -694,19 +695,19 @@ const PatternProgressCard = ({ index, icon, name, completed, total, mastery }) =
   const percentage = total > 0 ? Math.round((completed / total) * 100) : 0;
   
   return (
-    <div className="flex items-center gap-4 p-4 bg-gradient-to-r from-gray-50 to-slate-50 rounded-xl hover:from-gray-100 hover:to-slate-100 transition-all group cursor-pointer">
-      <div className="relative">
-        <span className="text-2xl">{icon}</span>
+    <div className="flex items-center gap-3 sm:gap-4 p-3 sm:p-4 bg-gradient-to-r from-gray-50 to-slate-50 rounded-xl hover:from-gray-100 hover:to-slate-100 transition-all group cursor-pointer">
+      <div className="relative flex-shrink-0">
+        <span className="text-xl sm:text-2xl">{icon}</span>
         <span className="absolute -top-1 -left-1 w-4 h-4 bg-violet-200 text-violet-700 text-[10px] font-bold rounded-full flex items-center justify-center">
           {index}
         </span>
       </div>
-      <div className="flex-1">
-        <div className="flex items-center justify-between mb-1">
-          <span className="font-medium text-gray-800">{name}</span>
-          <span className="text-sm text-gray-500">{completed}/{total}</span>
+      <div className="flex-1 min-w-0">
+        <div className="flex items-center justify-between mb-1 gap-2">
+          <span className="font-medium text-gray-800 text-sm sm:text-base truncate">{name}</span>
+          <span className="text-xs sm:text-sm text-gray-500 flex-shrink-0">{completed}/{total}</span>
         </div>
-        <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
+        <div className="h-1.5 sm:h-2 bg-gray-200 rounded-full overflow-hidden">
           <div
             className="h-full bg-gradient-to-r from-violet-500 to-indigo-500 rounded-full transition-all duration-500"
             style={{ width: `${percentage}%` }}
@@ -714,7 +715,7 @@ const PatternProgressCard = ({ index, icon, name, completed, total, mastery }) =
         </div>
       </div>
       {mastery && mastery.level !== 'none' && (
-        <div className={`px-2 py-1 ${mastery.bgColor} ${mastery.color} text-xs font-medium rounded-lg`}>
+        <div className={`hidden sm:block px-2 py-1 ${mastery.bgColor} ${mastery.color} text-xs font-medium rounded-lg flex-shrink-0`}>
           {mastery.level === 'advanced' && <Award size={12} className="inline mr-1" />}
           {mastery.label}
         </div>
@@ -737,49 +738,51 @@ const LeaderboardRow = ({ rank, member, onRemove }) => {
   };
 
   return (
-    <div className={`flex items-center gap-4 p-4 rounded-xl border transition-all hover:shadow-md ${
+    <div className={`flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 p-3 sm:p-4 rounded-xl border transition-all hover:shadow-md ${
       member.isCurrentUser ? 'bg-violet-50 border-violet-200' : 'bg-gray-50 border-transparent hover:border-gray-200'
     }`}>
-      <div className={`w-10 h-10 rounded-xl flex items-center justify-center font-bold text-lg border-2 ${
-        rankColors[rank] || 'bg-gray-50 text-gray-500 border-gray-200'
-      }`}>
-        {rankIcons[rank] || rank}
+      <div className="flex items-center gap-3 sm:gap-4">
+        <div className={`w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl flex items-center justify-center font-bold text-base sm:text-lg border-2 flex-shrink-0 ${
+          rankColors[rank] || 'bg-gray-50 text-gray-500 border-gray-200'
+        }`}>
+          {rankIcons[rank] || rank}
+        </div>
+        <div className="flex-1 min-w-0 sm:flex-initial">
+          <p className="font-semibold text-gray-800 text-sm sm:text-base truncate">{member.name}</p>
+          <p className="text-xs sm:text-sm text-gray-500">
+            {member.totalCompleted} problems solved
+          </p>
+        </div>
       </div>
-      <div className="flex-1">
-        <p className="font-semibold text-gray-800">{member.name}</p>
-        <p className="text-sm text-gray-500">
-          {member.totalCompleted} problems solved
-        </p>
-      </div>
-      <div className="flex items-center gap-6 text-sm">
+      <div className="flex items-center justify-between sm:justify-end sm:flex-1 gap-3 sm:gap-6 text-xs sm:text-sm pl-11 sm:pl-0">
         <div className="text-center">
           <p className="font-semibold text-green-600">{member.easyCompleted}</p>
-          <p className="text-gray-400 text-xs">Easy</p>
+          <p className="text-gray-400 text-[10px] sm:text-xs">Easy</p>
         </div>
         <div className="text-center">
           <p className="font-semibold text-yellow-600">{member.mediumCompleted}</p>
-          <p className="text-gray-400 text-xs">Medium</p>
+          <p className="text-gray-400 text-[10px] sm:text-xs">Medium</p>
         </div>
         <div className="text-center">
           <p className="font-semibold text-red-600">{member.hardCompleted}</p>
-          <p className="text-gray-400 text-xs">Hard</p>
+          <p className="text-gray-400 text-[10px] sm:text-xs">Hard</p>
         </div>
         <div className="text-center">
-          <p className="font-semibold text-orange-500 flex items-center gap-1">
-            {member.streak} <Flame size={12} />
+          <p className="font-semibold text-orange-500 flex items-center justify-center gap-1">
+            {member.streak} <Flame size={10} className="sm:w-3 sm:h-3" />
           </p>
-          <p className="text-gray-400 text-xs">Streak</p>
+          <p className="text-gray-400 text-[10px] sm:text-xs">Streak</p>
         </div>
+        {onRemove && (
+          <button
+            onClick={onRemove}
+            className="p-1.5 sm:p-2 hover:bg-red-50 rounded-lg text-gray-400 hover:text-red-500 transition-colors"
+            title="Remove member"
+          >
+            <Trash2 size={14} className="sm:w-4 sm:h-4" />
+          </button>
+        )}
       </div>
-      {onRemove && (
-        <button
-          onClick={onRemove}
-          className="p-2 hover:bg-red-50 rounded-lg text-gray-400 hover:text-red-500 transition-colors"
-          title="Remove member"
-        >
-          <Trash2 size={16} />
-        </button>
-      )}
     </div>
   );
 };
