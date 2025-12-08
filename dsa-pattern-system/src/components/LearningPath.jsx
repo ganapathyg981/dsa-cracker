@@ -104,14 +104,14 @@ const LearningPath = ({ onSelectPattern }) => {
     <div className="max-w-4xl mx-auto p-4 sm:p-6">
       {/* Header */}
       <div className="text-center mb-6 sm:mb-10">
-        <div className="inline-flex items-center gap-2 sm:gap-3 bg-gradient-to-r from-violet-100 to-indigo-100 px-4 sm:px-6 py-2 sm:py-3 rounded-full mb-3 sm:mb-4">
-          <Rocket className="text-violet-600" size={20} />
-          <span className="text-sm sm:text-lg font-semibold text-violet-700">Structured Learning Path</span>
+        <div className="inline-flex items-center gap-2 sm:gap-3 bg-gradient-to-r from-violet-100 to-indigo-100 dark:from-violet-900/30 dark:to-indigo-900/30 px-4 sm:px-6 py-2 sm:py-3 rounded-full mb-3 sm:mb-4">
+          <Rocket className="text-violet-600 dark:text-violet-400" size={20} />
+          <span className="text-sm sm:text-lg font-semibold text-violet-700 dark:text-violet-300">Structured Learning Path</span>
         </div>
-        <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-2 sm:mb-3">
+        <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 dark:text-gray-100 mb-2 sm:mb-3">
           Master DSA Patterns Step by Step
         </h1>
-        <p className="text-sm sm:text-base text-gray-600 max-w-2xl mx-auto">
+        <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
           Follow this curated learning path designed for beginners to advanced learners.
           Each phase builds upon the previous one, ensuring solid foundations.
         </p>
@@ -120,15 +120,15 @@ const LearningPath = ({ onSelectPattern }) => {
       {/* Quick Stats */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6 sm:mb-10">
         {[
-          { label: 'Patterns', value: '15+', icon: Layers, color: 'blue' },
-          { label: 'Problems', value: '200+', icon: Target, color: 'green' },
-          { label: 'Learning Time', value: '10-20 wks', icon: Clock, color: 'purple' },
-          { label: 'Your Progress', value: `${Math.round(Object.keys(completedProblems).length / 15 * 100)}%`, icon: TrendingUp, color: 'orange' },
+          { label: 'Patterns', value: '15+', icon: Layers, color: 'blue', darkBg: 'dark:bg-blue-900/30', darkBorder: 'dark:border-blue-800', darkText: 'dark:text-blue-400' },
+          { label: 'Problems', value: '200+', icon: Target, color: 'green', darkBg: 'dark:bg-green-900/30', darkBorder: 'dark:border-green-800', darkText: 'dark:text-green-400' },
+          { label: 'Learning Time', value: '10-20 wks', icon: Clock, color: 'purple', darkBg: 'dark:bg-purple-900/30', darkBorder: 'dark:border-purple-800', darkText: 'dark:text-purple-400' },
+          { label: 'Your Progress', value: `${Math.round(Object.keys(completedProblems).length / 15 * 100)}%`, icon: TrendingUp, color: 'orange', darkBg: 'dark:bg-orange-900/30', darkBorder: 'dark:border-orange-800', darkText: 'dark:text-orange-400' },
         ].map((stat, idx) => (
-          <div key={idx} className={`p-3 sm:p-4 rounded-xl bg-${stat.color}-50 border border-${stat.color}-200 text-center`}>
-            <stat.icon className={`mx-auto mb-1.5 sm:mb-2 text-${stat.color}-500`} size={18} />
-            <div className="text-lg sm:text-xl font-bold text-gray-800">{stat.value}</div>
-            <div className="text-xs sm:text-sm text-gray-500">{stat.label}</div>
+          <div key={idx} className={`p-3 sm:p-4 rounded-xl bg-${stat.color}-50 ${stat.darkBg} border border-${stat.color}-200 ${stat.darkBorder} text-center`}>
+            <stat.icon className={`mx-auto mb-1.5 sm:mb-2 text-${stat.color}-500 ${stat.darkText}`} size={18} />
+            <div className="text-lg sm:text-xl font-bold text-gray-800 dark:text-gray-100">{stat.value}</div>
+            <div className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">{stat.label}</div>
           </div>
         ))}
       </div>
@@ -143,12 +143,12 @@ const LearningPath = ({ onSelectPattern }) => {
           return (
             <div 
               key={phase.id}
-              className="border rounded-xl sm:rounded-2xl overflow-hidden transition-all duration-300 border-gray-200 bg-white shadow-sm"
+              className="border rounded-xl sm:rounded-2xl overflow-hidden transition-all duration-300 border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-sm"
             >
               {/* Phase Header */}
               <button
                 onClick={() => setExpandedPhase(isExpanded ? null : phase.id)}
-                className="w-full px-3 sm:px-6 py-3 sm:py-5 flex items-center justify-between text-left hover:bg-gray-50 cursor-pointer gap-2 sm:gap-4"
+                className="w-full px-3 sm:px-6 py-3 sm:py-5 flex items-center justify-between text-left hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer gap-2 sm:gap-4"
               >
                 <div className="flex items-center gap-3 sm:gap-4 min-w-0 flex-1">
                   <div className={`
@@ -159,12 +159,12 @@ const LearningPath = ({ onSelectPattern }) => {
                   </div>
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2 flex-wrap">
-                      <h3 className="text-sm sm:text-lg font-semibold text-gray-800 truncate">{phase.title}</h3>
+                      <h3 className="text-sm sm:text-lg font-semibold text-gray-800 dark:text-gray-100 truncate">{phase.title}</h3>
                       {progress === 100 && (
-                        <Trophy className="text-yellow-500 flex-shrink-0" size={16} />
+                        <Trophy className="text-yellow-500 dark:text-yellow-400 flex-shrink-0" size={16} />
                       )}
                     </div>
-                    <p className="text-xs sm:text-sm text-gray-500 line-clamp-1">{phase.description}</p>
+                    <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 line-clamp-1">{phase.description}</p>
                   </div>
                 </div>
 
@@ -181,7 +181,7 @@ const LearningPath = ({ onSelectPattern }) => {
                       <circle
                         cx="50%" cy="50%" r="40%"
                         fill="none"
-                        stroke="#e5e7eb"
+                        className="stroke-gray-200 dark:stroke-gray-600"
                         strokeWidth="4"
                       />
                       <circle
@@ -199,7 +199,7 @@ const LearningPath = ({ onSelectPattern }) => {
                         </linearGradient>
                       </defs>
                     </svg>
-                    <span className="absolute inset-0 flex items-center justify-center text-xs sm:text-sm font-bold text-gray-700">
+                    <span className="absolute inset-0 flex items-center justify-center text-xs sm:text-sm font-bold text-gray-700 dark:text-gray-200">
                       {progress}%
                     </span>
                   </div>
@@ -217,8 +217,8 @@ const LearningPath = ({ onSelectPattern }) => {
               {/* Phase Content (Expanded) */}
               {isExpanded && (
                 <div className="px-3 sm:px-6 pb-4 sm:pb-6">
-                  <div className="border-t border-gray-100 pt-3 sm:pt-4">
-                    <h4 className="text-xs sm:text-sm font-semibold text-gray-500 uppercase tracking-wider mb-2 sm:mb-3">
+                  <div className="border-t border-gray-100 dark:border-gray-700 pt-3 sm:pt-4">
+                    <h4 className="text-xs sm:text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2 sm:mb-3">
                       Patterns to Master
                     </h4>
                     <div className="grid gap-2 sm:gap-3">
@@ -234,15 +234,15 @@ const LearningPath = ({ onSelectPattern }) => {
                           <button
                             key={pattern.id}
                             onClick={() => onSelectPattern && onSelectPattern(pattern.id)}
-                            className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 p-3 sm:p-4 bg-gray-50 hover:bg-gray-100 rounded-xl transition-all group text-left"
+                            className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 p-3 sm:p-4 bg-gray-50 dark:bg-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 rounded-xl transition-all group text-left"
                           >
                             <div className="flex items-center gap-3 sm:gap-4">
                               {/* Order Number */}
                               <div className={`
                                 w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center text-xs sm:text-sm font-bold flex-shrink-0
                                 ${patternProgress === 100 
-                                  ? 'bg-green-100 text-green-600' 
-                                  : `bg-${phase.color}-100 text-${phase.color}-600`
+                                  ? 'bg-green-100 dark:bg-green-900/50 text-green-600 dark:text-green-400' 
+                                  : `bg-${phase.color}-100 dark:bg-${phase.color}-900/50 text-${phase.color}-600 dark:text-${phase.color}-400`
                                 }
                               `}>
                                 {patternProgress === 100 ? (
@@ -255,36 +255,36 @@ const LearningPath = ({ onSelectPattern }) => {
                               {/* Pattern Info */}
                               <div className="flex-1 min-w-0">
                                 <div className="flex items-center gap-2 flex-wrap">
-                                  <span className="font-medium text-gray-800 group-hover:text-violet-700 text-sm sm:text-base">
+                                  <span className="font-medium text-gray-800 dark:text-gray-200 group-hover:text-violet-700 dark:group-hover:text-violet-400 text-sm sm:text-base">
                                     {pattern.name}
                                   </span>
                                   {pattern.required && (
-                                    <span className="px-1.5 sm:px-2 py-0.5 bg-rose-100 text-rose-600 text-[10px] sm:text-xs font-medium rounded-full">
+                                    <span className="px-1.5 sm:px-2 py-0.5 bg-rose-100 dark:bg-rose-900/50 text-rose-600 dark:text-rose-400 text-[10px] sm:text-xs font-medium rounded-full">
                                       Required
                                     </span>
                                   )}
                                 </div>
-                                <p className="text-xs sm:text-sm text-gray-500 truncate">{pattern.reason}</p>
+                                <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 truncate">{pattern.reason}</p>
                               </div>
                             </div>
 
                             {/* Progress */}
                             <div className="flex items-center gap-3 ml-10 sm:ml-0">
                               <div className="text-left sm:text-right">
-                                <div className="text-xs sm:text-sm font-medium text-gray-700">
+                                <div className="text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300">
                                   {completedCount}/{problemCount}
                                 </div>
-                                <div className="text-[10px] sm:text-xs text-gray-400">problems</div>
+                                <div className="text-[10px] sm:text-xs text-gray-400 dark:text-gray-500">problems</div>
                               </div>
                               
-                              <div className="w-16 sm:w-20 h-1.5 sm:h-2 bg-gray-200 rounded-full overflow-hidden">
+                              <div className="w-16 sm:w-20 h-1.5 sm:h-2 bg-gray-200 dark:bg-gray-600 rounded-full overflow-hidden">
                                 <div 
                                   className={`h-full bg-gradient-to-r ${phase.gradient} transition-all duration-300`}
                                   style={{ width: `${patternProgress}%` }}
                                 />
                               </div>
 
-                              <ArrowRight className="text-gray-300 group-hover:text-violet-500 group-hover:translate-x-1 transition-all hidden sm:block" size={18} />
+                              <ArrowRight className="text-gray-300 dark:text-gray-600 group-hover:text-violet-500 dark:group-hover:text-violet-400 group-hover:translate-x-1 transition-all hidden sm:block" size={18} />
                             </div>
                           </button>
                         );
@@ -293,10 +293,25 @@ const LearningPath = ({ onSelectPattern }) => {
                   </div>
 
                   {/* Phase Tips */}
-                  <div className={`mt-3 sm:mt-4 p-3 sm:p-4 bg-gradient-to-r ${phase.gradient.replace('500', '50')} rounded-xl`}>
+                  <div className={`mt-3 sm:mt-4 p-3 sm:p-4 rounded-xl ${
+                    phase.color === 'emerald' ? 'bg-gradient-to-r from-emerald-50 to-teal-50 dark:from-emerald-900/30 dark:to-teal-900/20 border border-emerald-200 dark:border-emerald-700' :
+                    phase.color === 'blue' ? 'bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/30 dark:to-indigo-900/20 border border-blue-200 dark:border-blue-700' :
+                    phase.color === 'purple' ? 'bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-900/30 dark:to-pink-900/20 border border-purple-200 dark:border-purple-700' :
+                    'bg-gradient-to-r from-orange-50 to-red-50 dark:from-orange-900/30 dark:to-red-900/20 border border-orange-200 dark:border-orange-700'
+                  }`}>
                     <div className="flex items-start gap-2 sm:gap-3">
-                      <Star className={`text-${phase.color}-500 flex-shrink-0`} size={16} />
-                      <p className={`text-xs sm:text-sm text-${phase.color}-700`}>
+                      <Star className={`flex-shrink-0 ${
+                        phase.color === 'emerald' ? 'text-emerald-500 dark:text-emerald-400' :
+                        phase.color === 'blue' ? 'text-blue-500 dark:text-blue-400' :
+                        phase.color === 'purple' ? 'text-purple-500 dark:text-purple-400' :
+                        'text-orange-500 dark:text-orange-400'
+                      }`} size={16} />
+                      <p className={`text-xs sm:text-sm ${
+                        phase.color === 'emerald' ? 'text-emerald-700 dark:text-emerald-300' :
+                        phase.color === 'blue' ? 'text-blue-700 dark:text-blue-300' :
+                        phase.color === 'purple' ? 'text-purple-700 dark:text-purple-300' :
+                        'text-orange-700 dark:text-orange-300'
+                      }`}>
                         {phaseIndex === 0 && "💡 Tip: Focus on understanding the pattern, not memorizing code. Do at least 3-5 problems per pattern before moving on."}
                         {phaseIndex === 1 && "💡 Tip: Binary Search and BFS/DFS are foundational for many advanced patterns. Take your time here!"}
                         {phaseIndex === 2 && "💡 Tip: DP problems need practice. Start with memoization (top-down), then try tabulation (bottom-up)."}
@@ -312,11 +327,11 @@ const LearningPath = ({ onSelectPattern }) => {
       </div>
 
       {/* Bottom CTA */}
-      <div className="mt-6 sm:mt-10 text-center p-4 sm:p-6 bg-gradient-to-r from-violet-50 to-indigo-50 rounded-xl sm:rounded-2xl border border-violet-200">
-        <h3 className="text-base sm:text-lg font-semibold text-gray-800 mb-2">
+      <div className="mt-6 sm:mt-10 text-center p-4 sm:p-6 bg-gradient-to-r from-violet-50 to-indigo-50 dark:from-violet-900/20 dark:to-indigo-900/20 rounded-xl sm:rounded-2xl border border-violet-200 dark:border-violet-800">
+        <h3 className="text-base sm:text-lg font-semibold text-gray-800 dark:text-gray-100 mb-2">
           Ready to Start Your Journey? 🚀
         </h3>
-        <p className="text-sm sm:text-base text-gray-600 mb-3 sm:mb-4">
+        <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400 mb-3 sm:mb-4">
           Begin with Arrays & Strings - the foundation of all DSA patterns.
         </p>
         <button

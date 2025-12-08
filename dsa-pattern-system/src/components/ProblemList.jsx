@@ -127,23 +127,23 @@ const ProblemList = ({ problems, patternId }) => {
         key={`${problem.name}-${idx}`}
         className={`
           flex items-center gap-2 sm:gap-3 p-2.5 sm:p-3 rounded-lg transition-all cursor-pointer group
-          ${problemCompleted ? 'bg-emerald-50/50' : 'hover:bg-violet-50/50'}
+          ${problemCompleted ? 'bg-emerald-50/50 dark:bg-emerald-900/20' : 'hover:bg-violet-50/50 dark:hover:bg-violet-900/20'}
         `}
         onClick={() => setSelectedProblem(problem)}
       >
         <button
           onClick={(e) => toggleComplete(problem.name, e)}
-          className="p-1 rounded-lg hover:bg-gray-200 transition-colors flex-shrink-0"
+          className="p-1 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors flex-shrink-0"
         >
           {problemCompleted ? (
-            <CheckCircle2 size={18} className="sm:w-5 sm:h-5 text-emerald-500" />
+            <CheckCircle2 size={18} className="sm:w-5 sm:h-5 text-emerald-500 dark:text-emerald-400" />
           ) : (
-            <Circle size={18} className="sm:w-5 sm:h-5 text-gray-300 group-hover:text-gray-400" />
+            <Circle size={18} className="sm:w-5 sm:h-5 text-gray-300 dark:text-gray-600 group-hover:text-gray-400 dark:group-hover:text-gray-500" />
           )}
         </button>
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap">
-            <span className={`font-medium text-sm sm:text-base truncate ${problemCompleted ? 'text-gray-400 line-through' : 'text-gray-800 group-hover:text-violet-700'}`}>
+            <span className={`font-medium text-sm sm:text-base truncate ${problemCompleted ? 'text-gray-400 dark:text-gray-500 line-through' : 'text-gray-800 dark:text-gray-200 group-hover:text-violet-700 dark:group-hover:text-violet-400'}`}>
               {problem.name}
             </span>
             {problem.leetcodeUrl && (
@@ -167,18 +167,18 @@ const ProblemList = ({ problems, patternId }) => {
               {problem.tags?.slice(0, 2).map((tag, tagIdx) => (
                 <span 
                   key={tagIdx}
-                  className="px-1.5 py-0.5 bg-gray-100 text-gray-600 text-[10px] rounded"
+                  className="px-1.5 py-0.5 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 text-[10px] rounded"
                 >
                   {tag}
                 </span>
               ))}
               {problem.tags?.length > 2 && (
-                <span className="text-[10px] text-gray-400">+{problem.tags.length - 2}</span>
+                <span className="text-[10px] text-gray-400 dark:text-gray-500">+{problem.tags.length - 2}</span>
               )}
             </div>
           </div>
         </div>
-        <ChevronRight size={16} className="sm:w-4 sm:h-4 text-gray-300 group-hover:text-violet-500 group-hover:translate-x-1 transition-all flex-shrink-0" />
+        <ChevronRight size={16} className="sm:w-4 sm:h-4 text-gray-300 dark:text-gray-600 group-hover:text-violet-500 dark:group-hover:text-violet-400 group-hover:translate-x-1 transition-all flex-shrink-0" />
       </div>
     );
   };
@@ -191,25 +191,25 @@ const ProblemList = ({ problems, patternId }) => {
         key={`${problem.name}-${idx}`}
         className={`
           transition-all cursor-pointer group hidden sm:table-row
-          ${problemCompleted ? 'bg-emerald-50/50' : 'hover:bg-violet-50/50'}
+          ${problemCompleted ? 'bg-emerald-50/50 dark:bg-emerald-900/20' : 'hover:bg-violet-50/50 dark:hover:bg-violet-900/20'}
         `}
         onClick={() => setSelectedProblem(problem)}
       >
         <td className="px-4 py-3 text-center">
           <button
             onClick={(e) => toggleComplete(problem.name, e)}
-            className="p-1 rounded-lg hover:bg-gray-200 transition-colors"
+            className="p-1 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
           >
             {problemCompleted ? (
-              <CheckCircle2 size={20} className="text-emerald-500" />
+              <CheckCircle2 size={20} className="text-emerald-500 dark:text-emerald-400" />
             ) : (
-              <Circle size={20} className="text-gray-300 group-hover:text-gray-400" />
+              <Circle size={20} className="text-gray-300 dark:text-gray-600 group-hover:text-gray-400 dark:group-hover:text-gray-500" />
             )}
           </button>
         </td>
         <td className="px-4 py-3">
           <div className="flex items-center gap-2">
-            <span className={`font-medium ${problemCompleted ? 'text-gray-400 line-through' : 'text-gray-800 group-hover:text-violet-700'}`}>
+            <span className={`font-medium ${problemCompleted ? 'text-gray-400 dark:text-gray-500 line-through' : 'text-gray-800 dark:text-gray-200 group-hover:text-violet-700 dark:group-hover:text-violet-400'}`}>
               {problem.name}
             </span>
             {problem.leetcodeUrl && (
@@ -218,7 +218,7 @@ const ProblemList = ({ problems, patternId }) => {
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={(e) => e.stopPropagation()}
-                className="p-1 rounded hover:bg-orange-100 transition-colors"
+                className="p-1 rounded hover:bg-orange-100 dark:hover:bg-orange-900/30 transition-colors"
                 title="Open on LeetCode"
               >
                 <ExternalLink size={14} className="text-orange-500" />
@@ -236,18 +236,18 @@ const ProblemList = ({ problems, patternId }) => {
             {problem.tags?.slice(0, 3).map((tag, tagIdx) => (
               <span 
                 key={tagIdx}
-                className="px-2 py-0.5 bg-gray-100 text-gray-600 text-xs rounded"
+                className="px-2 py-0.5 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 text-xs rounded"
               >
                 {tag}
               </span>
             ))}
             {problem.tags?.length > 3 && (
-              <span className="text-xs text-gray-400">+{problem.tags.length - 3}</span>
+              <span className="text-xs text-gray-400 dark:text-gray-500">+{problem.tags.length - 3}</span>
             )}
           </div>
         </td>
         <td className="px-4 py-3 text-center">
-          <ChevronRight size={16} className="text-gray-300 group-hover:text-violet-500 group-hover:translate-x-1 transition-all mx-auto" />
+          <ChevronRight size={16} className="text-gray-300 dark:text-gray-600 group-hover:text-violet-500 dark:group-hover:text-violet-400 group-hover:translate-x-1 transition-all mx-auto" />
         </td>
       </tr>
     );
@@ -258,21 +258,21 @@ const ProblemList = ({ problems, patternId }) => {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-4">
         <div>
-          <h2 className="text-lg sm:text-xl font-bold text-gray-800">Practice Problems</h2>
-          <p className="text-xs sm:text-sm text-gray-500 mt-0.5 sm:mt-1">
+          <h2 className="text-lg sm:text-xl font-bold text-gray-800 dark:text-gray-100">Practice Problems</h2>
+          <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mt-0.5 sm:mt-1">
             {completedCount} of {problems.length} completed • Tap for details
           </p>
         </div>
         
         {/* Progress Bar */}
         <div className="flex items-center gap-2 sm:gap-3">
-          <div className="w-24 sm:w-32 h-1.5 sm:h-2 bg-gray-200 rounded-full overflow-hidden">
+          <div className="w-24 sm:w-32 h-1.5 sm:h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
             <div 
               className="h-full bg-gradient-to-r from-violet-500 to-indigo-500 transition-all duration-300"
               style={{ width: `${(completedCount / problems.length) * 100}%` }}
             />
           </div>
-          <span className="text-xs sm:text-sm font-medium text-gray-600">
+          <span className="text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-400">
             {Math.round((completedCount / problems.length) * 100)}%
           </span>
         </div>
@@ -282,8 +282,8 @@ const ProblemList = ({ problems, patternId }) => {
       <div className="flex flex-col sm:flex-row sm:flex-wrap sm:items-center gap-2 sm:gap-4">
         {/* Difficulty Filter */}
         <div className="flex items-center gap-2 overflow-x-auto pb-1 sm:pb-0">
-          <Filter size={14} className="sm:w-4 sm:h-4 text-gray-400 flex-shrink-0" />
-          <span className="text-xs sm:text-sm text-gray-500 flex-shrink-0">Difficulty:</span>
+          <Filter size={14} className="sm:w-4 sm:h-4 text-gray-400 dark:text-gray-500 flex-shrink-0" />
+          <span className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 flex-shrink-0">Difficulty:</span>
           <div className="flex gap-1">
             {difficulties.map(diff => (
               <button
@@ -292,8 +292,8 @@ const ProblemList = ({ problems, patternId }) => {
                 className={`
                   px-2 sm:px-3 py-0.5 sm:py-1 rounded-full text-xs sm:text-sm font-medium transition-all whitespace-nowrap
                   ${filterDifficulty === diff
-                    ? 'bg-violet-100 text-violet-700'
-                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                    ? 'bg-violet-100 dark:bg-violet-900/50 text-violet-700 dark:text-violet-300'
+                    : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
                   }
                 `}
               >
@@ -306,8 +306,8 @@ const ProblemList = ({ problems, patternId }) => {
         {/* Category Filter */}
         {categories.length > 2 && (
           <div className="flex items-center gap-2 overflow-x-auto pb-1 sm:pb-0">
-            <Layers size={14} className="sm:w-4 sm:h-4 text-gray-400 flex-shrink-0" />
-            <span className="text-xs sm:text-sm text-gray-500 flex-shrink-0">Category:</span>
+            <Layers size={14} className="sm:w-4 sm:h-4 text-gray-400 dark:text-gray-500 flex-shrink-0" />
+            <span className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 flex-shrink-0">Category:</span>
             <div className="flex gap-1">
               {categories.map(cat => (
                 <button
@@ -316,8 +316,8 @@ const ProblemList = ({ problems, patternId }) => {
                   className={`
                     px-2 sm:px-3 py-0.5 sm:py-1 rounded-full text-xs sm:text-sm font-medium transition-all whitespace-nowrap
                     ${filterCategory === cat
-                      ? 'bg-violet-100 text-violet-700'
-                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                      ? 'bg-violet-100 dark:bg-violet-900/50 text-violet-700 dark:text-violet-300'
+                      : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
                     }
                   `}
                 >
@@ -330,11 +330,11 @@ const ProblemList = ({ problems, patternId }) => {
 
         {/* Sort */}
         <div className="flex items-center gap-2 sm:ml-auto">
-          <ArrowUpDown size={14} className="sm:w-4 sm:h-4 text-gray-400" />
+          <ArrowUpDown size={14} className="sm:w-4 sm:h-4 text-gray-400 dark:text-gray-500" />
           <select
             value={sortBy}
             onChange={(e) => setSortBy(e.target.value)}
-            className="px-2 sm:px-3 py-1 rounded-lg border border-gray-200 text-xs sm:text-sm text-gray-600 bg-white focus:outline-none focus:ring-2 focus:ring-violet-200"
+            className="px-2 sm:px-3 py-1 rounded-lg border border-gray-200 dark:border-gray-600 text-xs sm:text-sm text-gray-600 dark:text-gray-300 bg-white dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-violet-200 dark:focus:ring-violet-700"
           >
             <option value="category">Sort by Category</option>
             <option value="difficulty">Sort by Difficulty</option>
@@ -348,21 +348,21 @@ const ProblemList = ({ problems, patternId }) => {
         // Grouped view
         <div className="space-y-4 sm:space-y-6">
           {Object.entries(groupedProblems).map(([category, categoryProblems]) => (
-            <div key={category} className="border border-gray-200 rounded-xl overflow-hidden">
-              <div className="px-3 sm:px-4 py-2 sm:py-3 bg-gradient-to-r from-gray-50 to-slate-50 border-b border-gray-200 flex items-center gap-2">
+            <div key={category} className="border border-gray-200 dark:border-gray-700 rounded-xl overflow-hidden">
+              <div className="px-3 sm:px-4 py-2 sm:py-3 bg-gradient-to-r from-gray-50 to-slate-50 dark:from-gray-800 dark:to-gray-800 border-b border-gray-200 dark:border-gray-700 flex items-center gap-2">
                 {getCategoryIcon(category)}
-                <h3 className="font-semibold text-gray-700 text-sm sm:text-base">{category}</h3>
-                <span className="text-xs sm:text-sm text-gray-500">
+                <h3 className="font-semibold text-gray-700 dark:text-gray-200 text-sm sm:text-base">{category}</h3>
+                <span className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">
                   ({categoryProblems.filter(p => isCompleted(p.name)).length}/{categoryProblems.length})
                 </span>
               </div>
               {/* Mobile Card View */}
-              <div className="sm:hidden divide-y divide-gray-100">
+              <div className="sm:hidden divide-y divide-gray-100 dark:divide-gray-700">
                 {categoryProblems.map((problem, idx) => renderProblemCard(problem, idx))}
               </div>
               {/* Desktop Table View */}
               <table className="w-full hidden sm:table">
-                <tbody className="divide-y divide-gray-100">
+                <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
                   {categoryProblems.map((problem, idx) => renderProblemRow(problem, idx))}
                 </tbody>
               </table>
@@ -371,23 +371,23 @@ const ProblemList = ({ problems, patternId }) => {
         </div>
       ) : (
         // Flat view
-        <div className="border border-gray-200 rounded-xl overflow-hidden">
+        <div className="border border-gray-200 dark:border-gray-700 rounded-xl overflow-hidden">
           {/* Mobile Card View */}
-          <div className="sm:hidden divide-y divide-gray-100">
+          <div className="sm:hidden divide-y divide-gray-100 dark:divide-gray-700">
             {filteredProblems.map((problem, idx) => renderProblemCard(problem, idx))}
           </div>
           {/* Desktop Table View */}
           <table className="w-full hidden sm:table">
-            <thead className="bg-gray-50 border-b border-gray-200">
+            <thead className="bg-gray-50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
               <tr>
                 <th className="w-12 px-4 py-3"></th>
-                <th className="text-left px-4 py-3 text-sm font-semibold text-gray-600">Problem</th>
-                <th className="text-left px-4 py-3 text-sm font-semibold text-gray-600 w-24">Difficulty</th>
-                <th className="text-left px-4 py-3 text-sm font-semibold text-gray-600">Tags</th>
+                <th className="text-left px-4 py-3 text-sm font-semibold text-gray-600 dark:text-gray-300">Problem</th>
+                <th className="text-left px-4 py-3 text-sm font-semibold text-gray-600 dark:text-gray-300 w-24">Difficulty</th>
+                <th className="text-left px-4 py-3 text-sm font-semibold text-gray-600 dark:text-gray-300">Tags</th>
                 <th className="w-12 px-4 py-3"></th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-100">
+            <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
               {filteredProblems.map((problem, idx) => renderProblemRow(problem, idx))}
             </tbody>
           </table>
@@ -395,12 +395,12 @@ const ProblemList = ({ problems, patternId }) => {
       )}
 
       {/* Tip */}
-      <div className="p-3 sm:p-4 bg-gradient-to-r from-violet-50 to-indigo-50 rounded-xl border border-violet-200">
-        <p className="text-xs sm:text-sm text-violet-800">
-          💡 <strong>Recommended:</strong> Start with <span className="font-medium text-blue-600">Foundation</span>, 
-          then <span className="font-medium text-purple-600">Core</span>, 
-          then <span className="font-medium text-indigo-600">Practice</span>.
-          <span className="hidden sm:inline"> Save <span className="font-medium text-orange-600">Challenge</span> and <span className="font-medium text-rose-600">Advanced</span> for later.</span>
+      <div className="p-3 sm:p-4 bg-gradient-to-r from-violet-50 to-indigo-50 dark:from-violet-900/30 dark:to-indigo-900/30 rounded-xl border border-violet-200 dark:border-violet-700">
+        <p className="text-xs sm:text-sm text-violet-800 dark:text-violet-200">
+          💡 <strong>Recommended:</strong> Start with <span className="font-medium text-blue-600 dark:text-blue-400">Foundation</span>, 
+          then <span className="font-medium text-purple-600 dark:text-purple-400">Core</span>, 
+          then <span className="font-medium text-indigo-600 dark:text-indigo-400">Practice</span>.
+          <span className="hidden sm:inline"> Save <span className="font-medium text-orange-600 dark:text-orange-400">Challenge</span> and <span className="font-medium text-rose-600 dark:text-rose-400">Advanced</span> for later.</span>
         </p>
       </div>
 

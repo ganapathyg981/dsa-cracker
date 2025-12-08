@@ -100,7 +100,7 @@ function App() {
         return activeSection === 'menu' ? (
           <Menu topics={legacyTopics} onTopicSelect={handleTopicSelect} />
         ) : (
-          <div className="min-h-[calc(100vh-49px)] sm:min-h-[calc(100vh-57px)] bg-gradient-to-br from-blue-50 to-purple-50 p-4 sm:p-8">
+          <div className="min-h-[calc(100vh-49px)] sm:min-h-[calc(100vh-57px)] bg-gradient-to-br from-blue-50 to-purple-50 dark:from-gray-900 dark:to-gray-800 p-4 sm:p-8 transition-colors">
             <div className="max-w-4xl mx-auto">
               {!result ? (
                 currentNode && (
@@ -114,7 +114,7 @@ function App() {
                   />
                 )
               ) : (
-                <div className="bg-white rounded-xl sm:rounded-2xl shadow-xl p-4 sm:p-8">
+                <div className="bg-white dark:bg-gray-800 rounded-xl sm:rounded-2xl shadow-xl p-4 sm:p-8 transition-colors">
                   <ResultDisplay
                     result={result}
                     onReset={reset}
@@ -152,7 +152,7 @@ function App() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className="min-h-screen bg-gray-100 dark:bg-gray-900 transition-colors">
       <NavigationTabs 
         activeTab={activeTab} 
         onTabChange={setActiveTab}

@@ -3,12 +3,12 @@ import { Sparkles } from 'lucide-react';
 
 const ProTips = () => {
   return (
-    <div className="mt-6 sm:mt-8 bg-white rounded-xl shadow-lg p-4 sm:p-6">
-      <h3 className="font-bold text-gray-800 mb-2 sm:mb-3 flex items-center gap-2 text-sm sm:text-base">
-        <Sparkles className="text-yellow-500" size={18} />
+    <div className="mt-6 sm:mt-8 bg-white dark:bg-gray-800 rounded-xl shadow-lg p-4 sm:p-6 border border-gray-100 dark:border-gray-700">
+      <h3 className="font-bold text-gray-800 dark:text-gray-100 mb-2 sm:mb-3 flex items-center gap-2 text-sm sm:text-base">
+        <Sparkles className="text-yellow-500 dark:text-yellow-400" size={18} />
         Pro Tips
       </h3>
-      <ul className="space-y-1.5 sm:space-y-2 text-xs sm:text-sm text-gray-600">
+      <ul className="space-y-1.5 sm:space-y-2 text-xs sm:text-sm text-gray-600 dark:text-gray-400">
         <li>• Master one pattern before moving to the next</li>
         <li>• Practice 5-10 problems per pattern for muscle memory</li>
         <li>• Focus on recognizing patterns, not memorizing solutions</li>
@@ -19,4 +19,3 @@ const ProTips = () => {
 };
 
 export default ProTips;
-
