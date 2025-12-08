@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { 
   Filter, CheckCircle2, Circle, ExternalLink, ChevronRight, 
   Layers, Zap, Target, BookOpen, ArrowUpDown
@@ -7,7 +8,8 @@ import { getCompletedProblemsForPattern, toggleProblemComplete } from '../utils/
 import { getEnhancedProblems } from '../data/problemDetails';
 import ProblemModal from './ProblemModal';
 
-const ProblemList = ({ problems, patternId }) => {
+const ProblemList = ({ problems, patternId, initialProblem }) => {
+  const navigate = useNavigate();
   const [filterDifficulty, setFilterDifficulty] = useState('all');
   const [filterCategory, setFilterCategory] = useState('all');
   const [sortBy, setSortBy] = useState('category'); // 'category', 'difficulty', 'name'
@@ -19,6 +21,29 @@ const ProblemList = ({ problems, patternId }) => {
       setCompletedProblems(getCompletedProblemsForPattern(patternId));
     }
   }, [patternId]);
+  
+  // Open modal if initialProblem is provided via URL
+  useEffect(() => {
+    if (initialProblem && problems.length > 0) {
+      const enhanced = getEnhancedProblems(problems);
+      const problem = enhanced.find(p => p.name === initialProblem);
+      if (problem) {
+        setSelectedProblem(problem);
+      }
+    }
+  }, [initialProblem, problems]);
+  
+  // Handle opening a problem with URL update
+  const openProblem = (problem) => {
+    setSelectedProblem(problem);
+    navigate(`/explorer/${patternId}/problems/${encodeURIComponent(problem.name)}`, { replace: true });
+  };
+  
+  // Handle closing modal with URL update
+  const closeProblem = () => {
+    setSelectedProblem(null);
+    navigate(`/explorer/${patternId}/problems`, { replace: true });
+  };
 
   const difficulties = ['all', 'Easy', 'Medium', 'Hard'];
   
@@ -129,7 +154,7 @@ const ProblemList = ({ problems, patternId }) => {
           flex items-center gap-2 sm:gap-3 p-2.5 sm:p-3 rounded-lg transition-all cursor-pointer group
           ${problemCompleted ? 'bg-emerald-50/50 dark:bg-emerald-900/20' : 'hover:bg-violet-50/50 dark:hover:bg-violet-900/20'}
         `}
-        onClick={() => setSelectedProblem(problem)}
+        onClick={() => openProblem(problem)}
       >
         <button
           onClick={(e) => toggleComplete(problem.name, e)}
@@ -193,7 +218,7 @@ const ProblemList = ({ problems, patternId }) => {
           transition-all cursor-pointer group hidden sm:table-row
           ${problemCompleted ? 'bg-emerald-50/50 dark:bg-emerald-900/20' : 'hover:bg-violet-50/50 dark:hover:bg-violet-900/20'}
         `}
-        onClick={() => setSelectedProblem(problem)}
+        onClick={() => openProblem(problem)}
       >
         <td className="px-4 py-3 text-center">
           <button
@@ -409,7 +434,7 @@ const ProblemList = ({ problems, patternId }) => {
         <ProblemModal
           problem={selectedProblem}
           patternId={patternId}
-          onClose={() => setSelectedProblem(null)}
+          onClose={closeProblem}
           onToggleComplete={(name) => toggleComplete(name)}
           isCompleted={isCompleted(selectedProblem.name)}
         />

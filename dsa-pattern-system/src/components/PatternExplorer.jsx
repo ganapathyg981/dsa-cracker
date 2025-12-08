@@ -1,61 +1,42 @@
 import React, { useState, useEffect } from 'react';
-import { Lock, ChevronRight, Menu, X, ChevronDown } from 'lucide-react';
+import { useParams, useNavigate } from 'react-router-dom';
+import { Lock, ChevronRight, X } from 'lucide-react';
 import PatternDetail from './PatternDetail';
 import { topics, getPattern } from '../data/patterns';
 
 const PatternExplorer = ({ onMobilePatternSelectorToggle }) => {
-  // Check for selected pattern from Learning Path navigation
-  const getInitialPattern = () => {
-    const storedId = sessionStorage.getItem('selectedPatternId');
-    if (storedId) {
-      sessionStorage.removeItem('selectedPatternId'); // Clear after use
-      return storedId;
-    }
-    return 'arrays-strings'; // Default to Arrays & Strings for beginners
-  };
-
-  const [selectedPatternId, setSelectedPatternId] = useState(getInitialPattern);
+  const { patternId: urlPatternId, section: urlSection, problemName: urlProblemName } = useParams();
+  const navigate = useNavigate();
+  
+  // Use URL param or default to arrays-strings
+  const [selectedPatternId, setSelectedPatternId] = useState(urlPatternId || 'arrays-strings');
   const [searchQuery, setSearchQuery] = useState('');
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  
-  // Store current pattern in session storage for mobile nav
-  React.useEffect(() => {
-    sessionStorage.setItem('currentPatternId', selectedPatternId);
-  }, [selectedPatternId]);
 
-  // Listen for pattern selection from other components
+  // Sync with URL params
   useEffect(() => {
-    const checkForPatternSelection = () => {
-      const storedId = sessionStorage.getItem('selectedPatternId');
-      if (storedId) {
-        setSelectedPatternId(storedId);
-        sessionStorage.removeItem('selectedPatternId');
-      }
-    };
-    
-    window.addEventListener('storage', checkForPatternSelection);
-    return () => window.removeEventListener('storage', checkForPatternSelection);
-  }, []);
+    if (urlPatternId && urlPatternId !== selectedPatternId) {
+      setSelectedPatternId(urlPatternId);
+    }
+  }, [urlPatternId]);
 
   const filteredTopics = topics.filter(topic =>
     topic.label.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   const selectedPattern = getPattern(selectedPatternId);
-  const currentTopic = topics.find(t => t.id === selectedPatternId);
 
   const handlePatternSelect = (patternId) => {
     setSelectedPatternId(patternId);
     setSidebarOpen(false);
-    sessionStorage.setItem('currentPatternId', patternId);
-    // Force re-render of parent to update mobile nav
+    navigate(`/explorer/${patternId}`);
     if (onMobilePatternSelectorToggle) {
       onMobilePatternSelectorToggle(false);
     }
   };
   
   // Open sidebar when mobile pattern selector is clicked
-  React.useEffect(() => {
+  useEffect(() => {
     const handleMobileOpen = () => {
       setSidebarOpen(true);
     };
@@ -157,7 +138,11 @@ const PatternExplorer = ({ onMobilePatternSelectorToggle }) => {
       {/* Main Content */}
       <main className="flex-1 flex flex-col overflow-hidden bg-white dark:bg-gray-900">
         {selectedPattern ? (
-          <PatternDetail pattern={selectedPattern} />
+          <PatternDetail 
+            pattern={selectedPattern} 
+            initialSection={urlSection}
+            initialProblem={urlProblemName ? decodeURIComponent(urlProblemName) : null}
+          />
         ) : (
           <div className="flex items-center justify-center h-full text-gray-500 dark:text-gray-400">
             <div className="text-center">
@@ -172,4 +157,3 @@ const PatternExplorer = ({ onMobilePatternSelectorToggle }) => {
 };
 
 export default PatternExplorer;
-
