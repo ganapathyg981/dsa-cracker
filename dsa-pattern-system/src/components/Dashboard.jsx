@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { 
   Trophy, Target, Flame, TrendingUp, Download, Upload, 
   CheckCircle2, Clock, Award, Users, ChevronRight, X, Trash2,
@@ -10,10 +11,9 @@ import {
   getWeeklyProgress, exportProgress, importMemberProgress, 
   getLeaderboardData, getRecentActivity, getImportedMembers, removeImportedMember,
   downloadProgressBackup, copyProgressToClipboard, importOwnProgress,
-  getAllBackups, restoreFromBackup, getLastBackupTime, toggleProblemComplete,
+  getAllBackups, restoreFromBackup, getLastBackupTime,
   getCompletedProblemsForPattern
 } from '../utils/storage';
-import ProblemModal from './ProblemModal';
 
 // Fun motivational messages
 const motivationalMessages = [
@@ -56,6 +56,7 @@ const getQuickWins = (allPatterns, stats) => {
 };
 
 const Dashboard = () => {
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('overview');
   const [showImportModal, setShowImportModal] = useState(false);
   const [showBackupModal, setShowBackupModal] = useState(false);
@@ -63,7 +64,6 @@ const Dashboard = () => {
   const [importSuccess, setImportSuccess] = useState(null);
   const [copiedToClipboard, setCopiedToClipboard] = useState(false);
   const [backups, setBackups] = useState([]);
-  const [selectedProblem, setSelectedProblem] = useState(null);
   const [refreshKey, setRefreshKey] = useState(0);
   const [dashboardData, setDashboardData] = useState(null);
   const fileInputRef = useRef(null);
@@ -189,14 +189,6 @@ const Dashboard = () => {
   const handleSetGoal = (target) => {
     setWeeklyGoal(target);
     window.location.reload();
-  };
-
-  const handleToggleProblemComplete = (problemName) => {
-    if (selectedProblem?.patternId) {
-      toggleProblemComplete(selectedProblem.patternId, problemName);
-      // Force a re-render by updating state - this will recalculate stats and quickWins
-      setRefreshKey(prev => prev + 1);
-    }
   };
 
   const tabs = [
@@ -343,7 +335,7 @@ const Dashboard = () => {
                   {quickWins.map((problem, idx) => (
                     <div 
                       key={idx} 
-                      onClick={() => setSelectedProblem({ ...problem, patternId: problem.patternId })}
+                      onClick={() => navigate(`/explorer/${problem.patternId}/problems/${encodeURIComponent(problem.name)}`)}
                       className="flex items-center gap-3 p-3 bg-white dark:bg-gray-800 rounded-xl border border-emerald-100 dark:border-gray-700 hover:border-emerald-300 dark:hover:border-emerald-600 hover:shadow-sm transition-all cursor-pointer group"
                     >
                       <span className="text-xl">{problem.patternIcon}</span>
@@ -658,16 +650,6 @@ const Dashboard = () => {
         </div>
       )}
 
-      {/* Problem Modal */}
-      {selectedProblem && (
-        <ProblemModal
-          problem={selectedProblem}
-          patternId={selectedProblem.patternId}
-          onClose={() => setSelectedProblem(null)}
-          onToggleComplete={handleToggleProblemComplete}
-          isCompleted={getCompletedProblemsForPattern(selectedProblem.patternId)[selectedProblem.name] || false}
-        />
-      )}
     </div>
   );
 };

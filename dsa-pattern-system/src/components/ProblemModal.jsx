@@ -41,12 +41,12 @@ const ProblemModal = ({ problem, patternId, onClose, onToggleComplete, isComplet
 
   return (
     <div 
-      className="fixed inset-0 bg-black/60 dark:bg-black/80 backdrop-blur-sm flex items-center justify-center z-[60] p-2 sm:p-4 animate-fade-in"
+      className="fixed inset-0 bg-black/60 dark:bg-black/80 backdrop-blur-sm flex items-center justify-center z-[60] p-2 sm:p-4 animate-fade-in !m-0"
       onClick={(e) => e.target === e.currentTarget && onClose()}
     >
       <div className="bg-white dark:bg-gray-800 rounded-xl sm:rounded-2xl shadow-2xl max-w-3xl w-full max-h-[92vh] sm:max-h-[88vh] overflow-hidden flex flex-col animate-scale-in">
         {/* Header */}
-        <div className="px-3 sm:px-6 py-3 sm:py-4 border-b border-gray-100 dark:border-gray-700 flex items-start justify-between bg-gradient-to-r from-slate-50 to-gray-50 dark:from-gray-800 dark:to-gray-900">
+        <div className="px-3 sm:px-6 py-3 sm:py-4 border-b border-gray-200 dark:border-gray-700 flex items-start justify-between bg-white dark:bg-gray-800">
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 sm:gap-3 mb-1.5 sm:mb-2 flex-wrap">
               <span className={`px-2 sm:px-3 py-0.5 sm:py-1 text-xs sm:text-sm font-medium rounded-lg border ${getDifficultyColor(problem.difficulty)}`}>

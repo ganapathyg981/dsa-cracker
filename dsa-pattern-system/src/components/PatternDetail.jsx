@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import { Clock, Cpu, BookOpen, Code2, AlertTriangle, Layers, ListChecks, Database, Lightbulb, Target, Link2, Sparkles } from 'lucide-react';
 import TheorySection from './TheorySection';
 import CodeTemplate from './CodeTemplate';
@@ -197,9 +198,25 @@ const IntroductionSection = ({ introduction, recognitionSignals, relatedPatterns
   );
 };
 
-const PatternDetail = ({ pattern }) => {
+const PatternDetail = ({ pattern, initialSection, initialProblem }) => {
+  const navigate = useNavigate();
+  
   // Default to 'intro' if introduction exists, otherwise 'theory'
-  const [activeSection, setActiveSection] = useState(pattern.introduction ? 'intro' : 'theory');
+  const defaultSection = pattern.introduction ? 'intro' : 'theory';
+  const [activeSection, setActiveSection] = useState(initialSection || defaultSection);
+
+  // Sync with URL params
+  useEffect(() => {
+    if (initialSection && initialSection !== activeSection) {
+      setActiveSection(initialSection);
+    }
+  }, [initialSection]);
+  
+  // Handle section change with URL update
+  const handleSectionChange = (sectionId) => {
+    setActiveSection(sectionId);
+    navigate(`/explorer/${pattern.id}/${sectionId}`, { replace: true });
+  };
 
   // Build sections dynamically based on available content
   const sections = [
@@ -253,7 +270,7 @@ const PatternDetail = ({ pattern }) => {
               return (
                 <button
                   key={section.id}
-                  onClick={() => setActiveSection(section.id)}
+                  onClick={() => handleSectionChange(section.id)}
                   className={`
                     flex items-center gap-1 px-2 sm:px-2.5 py-1 rounded text-[11px] sm:text-xs font-semibold whitespace-nowrap transition-all flex-shrink-0
                     ${isActive
@@ -306,7 +323,7 @@ const PatternDetail = ({ pattern }) => {
           )}
           
           {activeSection === 'problems' && (
-            <ProblemList problems={pattern.problems} patternId={pattern.id} />
+            <ProblemList problems={pattern.problems} patternId={pattern.id} initialProblem={initialProblem} />
           )}
           
           {activeSection === 'mistakes' && (

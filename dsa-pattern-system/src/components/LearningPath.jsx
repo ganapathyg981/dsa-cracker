@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { 
   Rocket, BookOpen, Target, Layers, Zap, Trophy, 
   ChevronRight, CheckCircle2, Circle, Star,
@@ -8,6 +9,7 @@ import { getAvailablePatterns } from '../data/patterns';
 import { getAllCompletedProblems } from '../utils/storage';
 
 const LearningPath = ({ onSelectPattern }) => {
+  const navigate = useNavigate();
   const [completedProblems, setCompletedProblems] = useState({});
   const [expandedPhase, setExpandedPhase] = useState('beginner');
   
@@ -233,7 +235,7 @@ const LearningPath = ({ onSelectPattern }) => {
                         return (
                           <button
                             key={pattern.id}
-                            onClick={() => onSelectPattern && onSelectPattern(pattern.id)}
+                            onClick={() => navigate(`/explorer/${pattern.id}`)}
                             className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 p-3 sm:p-4 bg-gray-50 dark:bg-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 rounded-xl transition-all group text-left"
                           >
                             <div className="flex items-center gap-3 sm:gap-4">
@@ -335,7 +337,7 @@ const LearningPath = ({ onSelectPattern }) => {
           Begin with Arrays & Strings - the foundation of all DSA patterns.
         </p>
         <button
-          onClick={() => onSelectPattern && onSelectPattern('arrays-strings')}
+          onClick={() => navigate('/explorer/arrays-strings')}
           className="px-5 sm:px-6 py-2.5 sm:py-3 bg-gradient-to-r from-violet-500 to-indigo-500 text-white font-medium rounded-xl hover:shadow-lg transition-all text-sm sm:text-base"
         >
           Start Learning Now

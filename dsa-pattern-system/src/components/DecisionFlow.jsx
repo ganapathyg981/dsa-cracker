@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { ChevronRight, Home } from 'lucide-react';
 
 const DecisionFlow = ({ 
@@ -9,11 +10,21 @@ const DecisionFlow = ({
   onReset,
   onBackToMenu 
 }) => {
+  const navigate = useNavigate();
+  
+  const handleBackToMenu = () => {
+    if (onBackToMenu) {
+      onBackToMenu();
+    } else {
+      navigate('/decision-tree');
+    }
+  };
+  
   return (
     <div className="bg-white dark:bg-gray-800 rounded-xl sm:rounded-2xl shadow-xl p-4 sm:p-8">
       <div className="flex items-center gap-2 sm:gap-3 mb-4 sm:mb-6">
         <button 
-          onClick={onBackToMenu}
+          onClick={handleBackToMenu}
           className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 flex items-center gap-1.5 sm:gap-2 font-semibold text-sm sm:text-base"
         >
           <Home size={18} className="sm:w-5 sm:h-5" /> Menu

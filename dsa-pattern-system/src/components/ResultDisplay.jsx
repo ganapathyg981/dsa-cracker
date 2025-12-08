@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { CheckCircle, Copy, Check } from 'lucide-react';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
 
 const ResultDisplay = ({ result, onReset, onBackToMenu }) => {
+  const navigate = useNavigate();
   const [copied, setCopied] = useState(false);
 
   const copyCode = async () => {
@@ -107,7 +109,7 @@ const ResultDisplay = ({ result, onReset, onBackToMenu }) => {
           Try Another Problem
         </button>
         <button
-          onClick={onBackToMenu}
+          onClick={() => onBackToMenu ? onBackToMenu() : navigate('/decision-tree')}
           className="flex-1 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 px-6 py-3 rounded-xl hover:bg-gray-200 dark:hover:bg-gray-600 transition-all font-semibold"
         >
           Back to Menu

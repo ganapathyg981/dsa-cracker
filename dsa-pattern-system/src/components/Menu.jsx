@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Sparkles, ChevronRight, Zap, Target, Trophy, Rocket } from 'lucide-react';
 import { categories } from '../data/topics';
 
@@ -24,6 +25,8 @@ const categoryBgColors = {
 };
 
 const Menu = ({ topics, onTopicSelect }) => {
+  const navigate = useNavigate();
+  
   // Group topics by category
   const groupedTopics = topics.reduce((acc, topic) => {
     const cat = topic.category || 'beginner';
@@ -31,6 +34,14 @@ const Menu = ({ topics, onTopicSelect }) => {
     acc[cat].push(topic);
     return acc;
   }, {});
+  
+  const handleTopicClick = (topicId) => {
+    if (onTopicSelect) {
+      onTopicSelect(topicId);
+    } else {
+      navigate(`/decision-tree/${topicId}`);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-violet-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 p-4 sm:p-6">
@@ -77,7 +88,7 @@ const Menu = ({ topics, onTopicSelect }) => {
                   {topicsInCategory.map((topic, index) => (
                     <button
                       key={topic.id}
-                      onClick={() => onTopicSelect(topic.id)}
+                      onClick={() => handleTopicClick(topic.id)}
                       className={`
                         group relative p-3 sm:p-4 rounded-lg sm:rounded-xl border-2 transition-all duration-200
                         hover:shadow-lg hover:-translate-y-0.5
