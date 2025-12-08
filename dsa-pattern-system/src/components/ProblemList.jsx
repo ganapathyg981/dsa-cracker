@@ -1,26 +1,27 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
   Filter, CheckCircle2, Circle, ExternalLink, ChevronRight, 
-  Layers, Zap, Target, BookOpen, ArrowUpDown
+  Layers, Zap, Target, BookOpen, ArrowUpDown, Loader2
 } from 'lucide-react';
-import { getCompletedProblemsForPattern, toggleProblemComplete } from '../utils/storage';
+import { useUserData } from '../App';
+import { toggleProblemInProgress } from '../utils/storage';
 import { getEnhancedProblems } from '../data/problemDetails';
 import ProblemModal from './ProblemModal';
 
 const ProblemList = ({ problems, patternId, initialProblem }) => {
   const navigate = useNavigate();
+  const { userData, saveData } = useUserData();
   const [filterDifficulty, setFilterDifficulty] = useState('all');
   const [filterCategory, setFilterCategory] = useState('all');
   const [sortBy, setSortBy] = useState('category'); // 'category', 'difficulty', 'name'
-  const [completedProblems, setCompletedProblems] = useState({});
   const [selectedProblem, setSelectedProblem] = useState(null);
+  const [savingProblem, setSavingProblem] = useState(null);
 
-  useEffect(() => {
-    if (patternId) {
-      setCompletedProblems(getCompletedProblemsForPattern(patternId));
-    }
-  }, [patternId]);
+  // Get completed problems from context
+  const completedProblems = useMemo(() => {
+    return userData?.progress?.completedProblems?.[patternId] || {};
+  }, [userData?.progress?.completedProblems, patternId]);
   
   // Open modal if initialProblem is provided via URL
   useEffect(() => {
@@ -111,12 +112,21 @@ const ProblemList = ({ problems, patternId, initialProblem }) => {
     return groups;
   }, [filteredProblems, sortBy]);
 
-  const toggleComplete = (problemName, e) => {
+  const toggleComplete = useCallback(async (problemName, e) => {
     if (e) e.stopPropagation();
-    if (!patternId) return;
-    toggleProblemComplete(patternId, problemName);
-    setCompletedProblems(getCompletedProblemsForPattern(patternId));
-  };
+    if (!patternId || !userData?.progress) return;
+    
+    setSavingProblem(problemName);
+    
+    try {
+      const newProgress = toggleProblemInProgress(userData.progress, patternId, problemName);
+      await saveData(newProgress, userData.goals);
+    } catch (error) {
+      console.error('Failed to save progress:', error);
+    } finally {
+      setSavingProblem(null);
+    }
+  }, [patternId, userData, saveData]);
 
   const isCompleted = (problemName) => {
     return !!completedProblems[problemName];
@@ -158,9 +168,12 @@ const ProblemList = ({ problems, patternId, initialProblem }) => {
       >
         <button
           onClick={(e) => toggleComplete(problem.name, e)}
-          className="p-1 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors flex-shrink-0"
+          disabled={savingProblem === problem.name}
+          className="p-1 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors flex-shrink-0 disabled:opacity-50"
         >
-          {problemCompleted ? (
+          {savingProblem === problem.name ? (
+            <Loader2 size={18} className="sm:w-5 sm:h-5 text-violet-500 animate-spin" />
+          ) : problemCompleted ? (
             <CheckCircle2 size={18} className="sm:w-5 sm:h-5 text-emerald-500 dark:text-emerald-400" />
           ) : (
             <Circle size={18} className="sm:w-5 sm:h-5 text-gray-300 dark:text-gray-600 group-hover:text-gray-400 dark:group-hover:text-gray-500" />
@@ -223,9 +236,12 @@ const ProblemList = ({ problems, patternId, initialProblem }) => {
         <td className="px-4 py-3 text-center">
           <button
             onClick={(e) => toggleComplete(problem.name, e)}
-            className="p-1 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+            disabled={savingProblem === problem.name}
+            className="p-1 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors disabled:opacity-50"
           >
-            {problemCompleted ? (
+            {savingProblem === problem.name ? (
+              <Loader2 size={20} className="text-violet-500 animate-spin" />
+            ) : problemCompleted ? (
               <CheckCircle2 size={20} className="text-emerald-500 dark:text-emerald-400" />
             ) : (
               <Circle size={20} className="text-gray-300 dark:text-gray-600 group-hover:text-gray-400 dark:group-hover:text-gray-500" />

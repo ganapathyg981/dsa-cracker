@@ -3,19 +3,19 @@ import { useNavigate } from 'react-router-dom';
 import { 
   Trophy, Target, Flame, TrendingUp, Download, Upload, 
   CheckCircle2, Clock, Award, Users, ChevronRight, X, Trash2,
-  Zap, Sparkles, Star, Coffee, Rocket, Copy, Shield, RotateCcw, Check
+  Zap, Sparkles, Star, Coffee, Rocket, Copy, Shield, RotateCcw, Check,
+  UserPlus, Loader2, CloudOff, Cloud
 } from 'lucide-react';
 import { topics, patterns, getPattern } from '../data/patterns';
+import { useUserData } from '../App';
 import { 
-  getUserProfile, getTotalStats, getWeeklyGoals, setWeeklyGoal,
-  getWeeklyProgress, exportProgress, importMemberProgress, 
-  getLeaderboardData, getRecentActivity, getImportedMembers, removeImportedMember,
-  downloadProgressBackup, copyProgressToClipboard, importOwnProgress,
-  getAllBackups, restoreFromBackup, getLastBackupTime,
-  getCompletedProblemsForPattern
+  getTotalStats, getWeeklyProgress, getRecentActivity, 
+  getMonitoredUsers, addMonitoredUser, removeMonitoredUser, getMasteryLevel,
+  downloadProgressBackup, copyProgressToClipboard, parseImportedProgress,
+  buildLeaderboardEntry, getCurrentUserId, getWeekStart
 } from '../utils/storage';
+import { getAllUsers, getMultipleUsersProgress, saveUserProgress, isConfigured } from '../services/gistService';
 
-// Fun motivational messages
 const motivationalMessages = [
   "You're crushing it! 💪",
   "Keep the momentum going! 🚀",
@@ -29,7 +29,6 @@ const getRandomMotivation = () => {
   return motivationalMessages[Math.floor(Math.random() * motivationalMessages.length)];
 };
 
-// Quick win problems (easiest unsolved)
 const getQuickWins = (allPatterns, stats) => {
   const quickWins = [];
   for (const pattern of allPatterns) {
@@ -39,7 +38,6 @@ const getQuickWins = (allPatterns, stats) => {
         const patternStats = stats.patternStats[pattern.id];
         const isCompleted = patternStats?.completedProblems?.includes(problem.name);
         if (!isCompleted) {
-          // Problems are already enhanced by getPattern()
           quickWins.push({
             ...problem,
             patternId: pattern.id,
@@ -57,77 +55,133 @@ const getQuickWins = (allPatterns, stats) => {
 
 const Dashboard = () => {
   const navigate = useNavigate();
+  const { userData, setUserData } = useUserData();
   const [activeTab, setActiveTab] = useState('overview');
   const [showImportModal, setShowImportModal] = useState(false);
   const [showBackupModal, setShowBackupModal] = useState(false);
+  const [showAddMemberModal, setShowAddMemberModal] = useState(false);
   const [importError, setImportError] = useState(null);
   const [importSuccess, setImportSuccess] = useState(null);
   const [copiedToClipboard, setCopiedToClipboard] = useState(false);
-  const [backups, setBackups] = useState([]);
   const [refreshKey, setRefreshKey] = useState(0);
-  const [dashboardData, setDashboardData] = useState(null);
+  const [availableUsers, setAvailableUsers] = useState({});
+  const [loadingUsers, setLoadingUsers] = useState(false);
+  const [monitoredUsersData, setMonitoredUsersData] = useState({});
+  const [loadingMonitored, setLoadingMonitored] = useState(false);
   const fileInputRef = useRef(null);
   const restoreInputRef = useRef(null);
 
-  // Calculate all dashboard data
+  // Compute dashboard data from userData context
+  const profile = userData?.profile;
+  const progress = userData?.progress;
+  const goals = userData?.goals || { target: 10 };
+  
+  const allPatterns = topics.filter(t => t.available).map(t => getPattern(t.id)).filter(Boolean);
+  const stats = getTotalStats(allPatterns, progress);
+  const weeklyProgress = getWeeklyProgress(progress);
+  const recentActivity = getRecentActivity(progress, 5);
+  const quickWins = getQuickWins(allPatterns, stats);
+
+  // Build current user leaderboard entry
+  const currentUserId = getCurrentUserId();
+  const leaderboard = profile ? [buildLeaderboardEntry(
+    currentUserId,
+    profile.name,
+    progress,
+    allPatterns,
+    true,
+    false
+  )] : [];
+
   useEffect(() => {
-    const profile = getUserProfile();
-    // Use getPattern to get enhanced problems with details from problemDetails.js
-    const allPatterns = topics.filter(t => t.available).map(t => getPattern(t.id)).filter(Boolean);
-    const stats = getTotalStats(allPatterns);
-    const weeklyGoals = getWeeklyGoals();
-    const weeklyProgress = getWeeklyProgress();
-    const recentActivity = getRecentActivity(5);
-    const leaderboard = getLeaderboardData(allPatterns);
-    const importedMembers = getImportedMembers();
-    const quickWins = getQuickWins(allPatterns, stats);
+    if (activeTab === 'leaderboard') {
+      loadMonitoredUsersProgress();
+    }
+  }, [activeTab, refreshKey]);
 
-    setDashboardData({
-      profile,
-      allPatterns,
-      stats,
-      weeklyGoals,
-      weeklyProgress,
-      recentActivity,
-      leaderboard,
-      importedMembers,
-      quickWins
-    });
-  }, [refreshKey]);
+  const loadAvailableUsers = async () => {
+    setLoadingUsers(true);
+    try {
+      const users = await getAllUsers();
+      setAvailableUsers(users);
+    } catch (error) {
+      console.error('Failed to load users:', error);
+    } finally {
+      setLoadingUsers(false);
+    }
+  };
 
-  if (!dashboardData) {
-    return <div className="min-h-[calc(100vh-57px)] bg-gradient-to-br from-slate-50 via-violet-50 to-indigo-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 flex items-center justify-center">
-      <div className="text-gray-500 dark:text-gray-400">Loading...</div>
-    </div>;
-  }
+  const loadMonitoredUsersProgress = async () => {
+    const monitoredUserIds = getMonitoredUsers();
+    if (monitoredUserIds.length === 0) return;
 
-  const { profile, allPatterns, stats, weeklyGoals, weeklyProgress, recentActivity, leaderboard, importedMembers, quickWins } = dashboardData;
+    setLoadingMonitored(true);
+    try {
+      const progressData = await getMultipleUsersProgress(monitoredUserIds);
+      setMonitoredUsersData(progressData);
+    } catch (error) {
+      console.error('Failed to load monitored users:', error);
+    } finally {
+      setLoadingMonitored(false);
+    }
+  };
+
+  const handleAddMember = async (userId) => {
+    addMonitoredUser(userId);
+    setShowAddMemberModal(false);
+    setRefreshKey(k => k + 1);
+    loadMonitoredUsersProgress();
+  };
+
+  const handleRemoveMonitoredUser = (userId) => {
+    removeMonitoredUser(userId);
+    setRefreshKey(k => k + 1);
+  };
 
   const handleExport = () => {
-    downloadProgressBackup();
+    downloadProgressBackup(profile, progress, goals);
   };
 
   const handleCopyToClipboard = async () => {
-    const result = await copyProgressToClipboard();
+    const result = await copyProgressToClipboard(profile, progress, goals);
     if (result.success) {
       setCopiedToClipboard(true);
       setTimeout(() => setCopiedToClipboard(false), 2000);
     }
   };
 
-  const handleRestoreFromFile = (e) => {
+  const handleRestoreFromFile = async (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
     const reader = new FileReader();
-    reader.onload = (event) => {
-      const result = importOwnProgress(event.target?.result);
+    reader.onload = async (event) => {
+      const result = parseImportedProgress(event.target?.result);
       if (result.success) {
-        setImportSuccess('Progress restored successfully! Refreshing...');
-        setImportError(null);
-        setTimeout(() => {
-          window.location.reload();
-        }, 1500);
+        try {
+          // Save to Gist
+          await saveUserProgress(currentUserId, {
+            profile: result.profile || profile,
+            progress: result.progress,
+            goals: result.goals || goals,
+          });
+          
+          // Update local state
+          setUserData({
+            profile: result.profile || profile,
+            progress: result.progress,
+            goals: result.goals || goals,
+          });
+          
+          setImportSuccess('Progress restored successfully!');
+          setImportError(null);
+          setTimeout(() => {
+            setImportSuccess(null);
+            setShowBackupModal(false);
+          }, 1500);
+        } catch (error) {
+          setImportError('Failed to save restored progress to cloud');
+        }
       } else {
         setImportError(result.error);
         setImportSuccess(null);
@@ -136,25 +190,6 @@ const Dashboard = () => {
     reader.readAsText(file);
     e.target.value = '';
   };
-
-  const loadBackups = async () => {
-    const savedBackups = await getAllBackups();
-    setBackups(savedBackups);
-  };
-
-  const handleRestoreFromBackup = (backup) => {
-    if (confirm(`Restore from backup dated ${new Date(backup.timestamp).toLocaleString()}? This will overwrite your current progress.`)) {
-      const success = restoreFromBackup(backup);
-      if (success) {
-        setImportSuccess('Progress restored from backup! Refreshing...');
-        setTimeout(() => {
-          window.location.reload();
-        }, 1500);
-      }
-    }
-  };
-
-  const lastBackup = getLastBackupTime();
 
   const handleImport = (e) => {
     const file = e.target.files?.[0];
@@ -162,16 +197,17 @@ const Dashboard = () => {
 
     const reader = new FileReader();
     reader.onload = (event) => {
-      const result = importMemberProgress(event.target?.result);
-      if (result.success) {
-        setImportSuccess(`Successfully imported ${result.memberName}'s progress!`);
+      const result = parseImportedProgress(event.target?.result);
+      if (result.success && result.profile?.name) {
+        // Add as monitored user from file (legacy support)
+        setImportSuccess(`Imported ${result.profile.name}'s progress for viewing`);
         setImportError(null);
         setTimeout(() => {
           setImportSuccess(null);
           setShowImportModal(false);
         }, 2000);
       } else {
-        setImportError(result.error);
+        setImportError(result.error || 'Invalid progress file');
         setImportSuccess(null);
       }
     };
@@ -179,17 +215,30 @@ const Dashboard = () => {
     e.target.value = '';
   };
 
-  const handleRemoveMember = (memberId, memberName) => {
-    if (confirm(`Remove ${memberName} from the leaderboard?`)) {
-      removeImportedMember(memberId);
-      window.location.reload();
+  const handleSetGoal = async (target) => {
+    const newGoals = { ...goals, target, weekStart: getWeekStart() };
+    try {
+      await saveUserProgress(currentUserId, {
+        profile,
+        progress,
+        goals: newGoals,
+      });
+      setUserData(prev => ({ ...prev, goals: newGoals }));
+    } catch (error) {
+      console.error('Failed to save goal:', error);
     }
   };
 
-  const handleSetGoal = (target) => {
-    setWeeklyGoal(target);
-    window.location.reload();
-  };
+  if (!userData) {
+    return (
+      <div className="min-h-[calc(100vh-57px)] bg-gradient-to-br from-slate-50 via-violet-50 to-indigo-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-12 h-12 border-4 border-violet-200 border-t-violet-600 rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-gray-500 dark:text-gray-400">Loading your progress...</p>
+        </div>
+      </div>
+    );
+  }
 
   const tabs = [
     { id: 'overview', label: 'Overview', icon: TrendingUp },
@@ -197,7 +246,6 @@ const Dashboard = () => {
     { id: 'leaderboard', label: 'Study Group', icon: Users },
   ];
 
-  // Calculate streak milestone
   const getStreakMilestone = (streak) => {
     if (streak >= 30) return { label: 'Legend', icon: '👑', color: 'text-yellow-500' };
     if (streak >= 14) return { label: 'On Fire', icon: '🔥', color: 'text-orange-500' };
@@ -208,10 +256,52 @@ const Dashboard = () => {
 
   const streakMilestone = getStreakMilestone(stats.streak.currentStreak);
 
+  const monitoredUsers = getMonitoredUsers();
+  const combinedLeaderboard = [...leaderboard];
+  
+  monitoredUsers.forEach(userId => {
+    const userData = monitoredUsersData[userId];
+    if (userData && !combinedLeaderboard.find(m => m.id === userId)) {
+      let totalCompleted = 0;
+      let easyCompleted = 0;
+      let mediumCompleted = 0;
+      let hardCompleted = 0;
+
+      allPatterns.forEach(pattern => {
+        const completedInPattern = userData.progress?.completedProblems?.[pattern.id] || {};
+        const patternProblems = pattern.problems || [];
+        
+        patternProblems.forEach(problem => {
+          if (completedInPattern[problem.name]) {
+            totalCompleted++;
+            switch (problem.difficulty) {
+              case 'Easy': easyCompleted++; break;
+              case 'Medium': mediumCompleted++; break;
+              case 'Hard': hardCompleted++; break;
+            }
+          }
+        });
+      });
+
+      combinedLeaderboard.push({
+        id: userId,
+        name: userData.profile?.name || userId,
+        isCurrentUser: false,
+        isRemote: true,
+        totalCompleted,
+        easyCompleted,
+        mediumCompleted,
+        hardCompleted,
+        streak: userData.progress?.streakData?.currentStreak || 0,
+      });
+    }
+  });
+
+  combinedLeaderboard.sort((a, b) => b.totalCompleted - a.totalCompleted);
+
   return (
     <div className="min-h-[calc(100vh-57px)] bg-gradient-to-br from-slate-50 via-violet-50 to-indigo-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 transition-colors">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4 sm:py-8">
-        {/* Header with motivation */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
           <div>
             <h1 className="text-xl sm:text-3xl font-bold text-gray-800 dark:text-gray-100 flex items-center gap-2">
@@ -227,25 +317,18 @@ const Dashboard = () => {
           </div>
           
           <div className="flex gap-2 sm:gap-3 flex-wrap sm:flex-nowrap">
-            {/* Backup Status */}
-            {lastBackup && (
-              <div className="hidden sm:flex items-center gap-2 px-3 py-2 bg-emerald-50 dark:bg-emerald-900/30 border border-emerald-200 dark:border-emerald-700 rounded-xl text-emerald-700 dark:text-emerald-300 text-sm">
-                <Shield size={16} />
-                <span>Auto-saved</span>
-              </div>
-            )}
             <button
-              onClick={() => {
-                setShowBackupModal(true);
-                loadBackups();
-              }}
+              onClick={() => setShowBackupModal(true)}
               className="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 sm:py-2.5 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl text-gray-700 dark:text-gray-300 font-medium hover:bg-gray-50 dark:hover:bg-gray-700 hover:border-gray-300 dark:hover:border-gray-600 transition-all shadow-sm hover:shadow-md text-sm sm:text-base"
             >
               <Shield size={16} className="sm:w-[18px] sm:h-[18px]" />
               <span className="hidden sm:inline">Backup</span>
             </button>
             <button
-              onClick={() => setShowImportModal(true)}
+              onClick={() => {
+                setShowAddMemberModal(true);
+                loadAvailableUsers();
+              }}
               className="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 sm:py-2.5 bg-gradient-to-r from-violet-600 to-indigo-600 text-white rounded-xl font-medium hover:from-violet-700 hover:to-indigo-700 transition-all shadow-lg shadow-violet-200 dark:shadow-violet-900/50 hover:shadow-xl hover:-translate-y-0.5 text-sm sm:text-base"
             >
               <Users size={16} className="sm:w-[18px] sm:h-[18px]" />
@@ -255,7 +338,6 @@ const Dashboard = () => {
           </div>
         </div>
 
-        {/* Stats Cards */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6">
           <StatCard
             icon={CheckCircle2}
@@ -268,12 +350,12 @@ const Dashboard = () => {
           <StatCard
             icon={Target}
             label="Weekly Goal"
-            value={`${weeklyProgress}/${weeklyGoals.target}`}
-            subtext={weeklyProgress >= weeklyGoals.target ? '🎉 Goal reached!' : `${weeklyGoals.target - weeklyProgress} to go`}
+            value={`${weeklyProgress}/${goals.target}`}
+            subtext={weeklyProgress >= goals.target ? '🎉 Goal reached!' : `${goals.target - weeklyProgress} to go`}
             color="violet"
-            progress={(weeklyProgress / weeklyGoals.target) * 100}
+            progress={(weeklyProgress / goals.target) * 100}
             onEdit={() => {
-              const newGoal = prompt('Set your weekly goal:', weeklyGoals.target);
+              const newGoal = prompt('Set your weekly goal:', goals.target);
               if (newGoal && !isNaN(parseInt(newGoal))) {
                 handleSetGoal(parseInt(newGoal));
               }
@@ -297,7 +379,6 @@ const Dashboard = () => {
           />
         </div>
 
-        {/* Tab Navigation */}
         <div className="flex gap-2 mb-6 overflow-x-auto pb-1">
           {tabs.map(tab => {
             const Icon = tab.icon;
@@ -318,10 +399,8 @@ const Dashboard = () => {
           })}
         </div>
 
-        {/* Content */}
         {activeTab === 'overview' && (
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
-            {/* Quick Wins Section */}
             <div className="bg-gradient-to-br from-emerald-50 to-green-50 dark:from-emerald-900/20 dark:to-green-900/20 rounded-2xl p-4 sm:p-5 shadow-sm border border-emerald-100 dark:border-emerald-800 lg:col-span-2">
               <h3 className="font-semibold text-emerald-800 dark:text-emerald-300 mb-3 flex flex-wrap items-center gap-2 text-sm sm:text-base">
                 <Zap size={16} className="sm:w-[18px] sm:h-[18px] text-emerald-600 dark:text-emerald-400" />
@@ -361,7 +440,6 @@ const Dashboard = () => {
               )}
             </div>
 
-            {/* Difficulty Breakdown */}
             <div className="bg-white dark:bg-gray-800 rounded-2xl p-4 sm:p-5 shadow-sm border border-gray-100 dark:border-gray-700">
               <h3 className="font-semibold text-gray-800 dark:text-gray-200 mb-4 text-sm sm:text-base">Difficulty Breakdown</h3>
               <div className="space-y-4">
@@ -370,7 +448,6 @@ const Dashboard = () => {
                 <DifficultyBar label="Hard" completed={stats.hardCompleted} color="red" emoji="🔴" />
               </div>
               
-              {/* Daily Tip */}
               <div className="mt-6 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-xl border border-blue-100 dark:border-blue-800">
                 <p className="text-xs text-blue-600 dark:text-blue-400 font-medium flex items-center gap-1">
                   <Coffee size={12} />
@@ -382,7 +459,6 @@ const Dashboard = () => {
               </div>
             </div>
 
-            {/* Recent Activity */}
             <div className="bg-white dark:bg-gray-800 rounded-2xl p-4 sm:p-5 shadow-sm border border-gray-100 dark:border-gray-700 lg:col-span-3">
               <h3 className="font-semibold text-gray-800 dark:text-gray-200 mb-4 flex items-center gap-2 text-sm sm:text-base">
                 <Clock size={16} className="sm:w-[18px] sm:h-[18px] text-gray-500 dark:text-gray-400" />
@@ -445,21 +521,35 @@ const Dashboard = () => {
           <div className="bg-white dark:bg-gray-800 rounded-2xl p-4 sm:p-6 shadow-sm border border-gray-100 dark:border-gray-700">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4 sm:mb-6">
               <h3 className="font-semibold text-gray-800 dark:text-gray-200 text-sm sm:text-base">Study Group Leaderboard</h3>
-              {Object.keys(importedMembers).length > 0 && (
-                <span className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">
-                  {Object.keys(importedMembers).length} member{Object.keys(importedMembers).length !== 1 ? 's' : ''} imported
-                </span>
-              )}
+              <div className="flex items-center gap-2">
+                {loadingMonitored && (
+                  <Loader2 size={16} className="animate-spin text-gray-400" />
+                )}
+                <button
+                  onClick={() => {
+                    setShowAddMemberModal(true);
+                    loadAvailableUsers();
+                  }}
+                  className="flex items-center gap-1.5 px-3 py-1.5 text-sm bg-violet-100 dark:bg-violet-900/40 text-violet-700 dark:text-violet-300 rounded-lg hover:bg-violet-200 dark:hover:bg-violet-900/60 transition-colors"
+                >
+                  <UserPlus size={14} />
+                  Add Member
+                </button>
+              </div>
             </div>
             
-            {leaderboard.length > 1 ? (
+            {combinedLeaderboard.length > 0 ? (
               <div className="space-y-3">
-                {leaderboard.map((member, idx) => (
+                {combinedLeaderboard.map((member, idx) => (
                   <LeaderboardRow
                     key={member.id}
                     rank={idx + 1}
                     member={member}
-                    onRemove={!member.isCurrentUser ? () => handleRemoveMember(member.id, member.name) : null}
+                    onRemove={
+                      member.isRemote 
+                        ? () => handleRemoveMonitoredUser(member.id)
+                        : null
+                    }
                   />
                 ))}
               </div>
@@ -467,19 +557,110 @@ const Dashboard = () => {
               <div className="text-center py-12 text-gray-400 dark:text-gray-500">
                 <Users size={48} className="mx-auto mb-3 opacity-50" />
                 <p className="font-medium text-gray-600 dark:text-gray-400 mb-1">No study group members yet</p>
-                <p className="text-sm text-gray-500 dark:text-gray-500">Import progress files from your study group to compare</p>
+                <p className="text-sm text-gray-500 dark:text-gray-500 mb-4">Add members from the cloud to compare progress</p>
+                <button
+                  onClick={() => {
+                    setShowAddMemberModal(true);
+                    loadAvailableUsers();
+                  }}
+                  className="inline-flex items-center gap-2 px-4 py-2 bg-violet-600 text-white rounded-lg hover:bg-violet-700 transition-colors"
+                >
+                  <UserPlus size={16} />
+                  Add Study Group Member
+                </button>
               </div>
             )}
           </div>
         )}
       </div>
 
-      {/* Import Modal (Study Group) */}
+      {showAddMemberModal && (
+        <div className="fixed inset-0 bg-black/50 dark:bg-black/70 backdrop-blur-sm flex items-center justify-center z-[60] p-4 animate-fade-in">
+          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-md w-full p-6 animate-scale-in max-h-[80vh] overflow-hidden flex flex-col">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-xl font-bold text-gray-800 dark:text-gray-100">Add Study Group Member</h3>
+              <button
+                onClick={() => setShowAddMemberModal(false)}
+                className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+              >
+                <X size={20} className="text-gray-500 dark:text-gray-400" />
+              </button>
+            </div>
+            
+            <p className="text-gray-600 dark:text-gray-400 mb-4">
+              Select a user from the cloud to add to your study group leaderboard.
+            </p>
+
+            <div className="flex-1 overflow-y-auto">
+              {loadingUsers ? (
+                <div className="flex items-center justify-center py-8">
+                  <Loader2 size={24} className="animate-spin text-violet-500" />
+                </div>
+              ) : Object.keys(availableUsers).length === 0 ? (
+                <div className="text-center py-8">
+                  <CloudOff size={40} className="mx-auto mb-2 text-gray-300" />
+                  <p className="text-gray-500">No users found in the cloud</p>
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  {Object.entries(availableUsers).map(([userId, user]) => {
+                    const isAlreadyAdded = monitoredUsers.includes(userId);
+                    const isCurrentUser = userId === currentUserId;
+                    
+                    return (
+                      <button
+                        key={userId}
+                        onClick={() => !isAlreadyAdded && !isCurrentUser && handleAddMember(userId)}
+                        disabled={isAlreadyAdded || isCurrentUser}
+                        className={`w-full flex items-center justify-between p-3 rounded-xl border transition-all ${
+                          isAlreadyAdded || isCurrentUser
+                            ? 'bg-gray-50 dark:bg-gray-700 border-gray-200 dark:border-gray-600 opacity-50 cursor-not-allowed'
+                            : 'bg-white dark:bg-gray-700 border-gray-200 dark:border-gray-600 hover:border-violet-300 dark:hover:border-violet-500 hover:shadow-md cursor-pointer'
+                        }`}
+                      >
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 bg-violet-100 dark:bg-violet-900/40 rounded-full flex items-center justify-center">
+                            <span className="text-violet-600 dark:text-violet-400 font-semibold">
+                              {user.displayName?.charAt(0).toUpperCase()}
+                            </span>
+                          </div>
+                          <div className="text-left">
+                            <p className="font-medium text-gray-800 dark:text-gray-200">{user.displayName}</p>
+                            <p className="text-xs text-gray-500 dark:text-gray-400">
+                              {isCurrentUser ? 'This is you' : isAlreadyAdded ? 'Already in group' : `Joined ${new Date(user.createdAt).toLocaleDateString()}`}
+                            </p>
+                          </div>
+                        </div>
+                        {!isAlreadyAdded && !isCurrentUser && (
+                          <UserPlus size={18} className="text-gray-400" />
+                        )}
+                        {isAlreadyAdded && (
+                          <Check size={18} className="text-emerald-500" />
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+
+            <div className="mt-4 pt-4 border-t border-gray-100 dark:border-gray-700">
+              <button
+                onClick={() => setShowImportModal(true)}
+                className="w-full py-2 text-sm text-gray-500 dark:text-gray-400 hover:text-violet-600 dark:hover:text-violet-400 transition-colors"
+              >
+                Or import from JSON file instead
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {showImportModal && (
         <div className="fixed inset-0 bg-black/50 dark:bg-black/70 backdrop-blur-sm flex items-center justify-center z-[60] p-4 animate-fade-in">
           <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-md w-full p-6 animate-scale-in">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-xl font-bold text-gray-800 dark:text-gray-100">Study Group</h3>
+              <h3 className="text-xl font-bold text-gray-800 dark:text-gray-100">Import from File</h3>
               <button
                 onClick={() => {
                   setShowImportModal(false);
@@ -527,7 +708,6 @@ const Dashboard = () => {
         </div>
       )}
 
-      {/* Backup & Restore Modal */}
       {showBackupModal && (
         <div className="fixed inset-0 bg-black/50 dark:bg-black/70 backdrop-blur-sm flex items-center justify-center z-[60] p-3 sm:p-4 animate-fade-in">
           <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-lg w-full p-4 sm:p-6 animate-scale-in max-h-[90vh] overflow-y-auto">
@@ -548,21 +728,14 @@ const Dashboard = () => {
               </button>
             </div>
 
-            {/* Auto-backup status */}
             <div className="mb-6 p-4 bg-emerald-50 dark:bg-emerald-900/30 border border-emerald-200 dark:border-emerald-800 rounded-xl">
               <div className="flex items-center gap-2 text-emerald-700 dark:text-emerald-300 mb-1">
-                <CheckCircle2 size={18} />
-                <span className="font-semibold">Auto-Backup Active</span>
+                <Cloud size={18} />
+                <span className="font-semibold">Cloud Sync Active</span>
               </div>
               <p className="text-emerald-600 dark:text-emerald-400 text-sm">
-                Your progress is automatically saved to your browser's IndexedDB. 
-                Even if localStorage is cleared, your data can be recovered.
+                Your progress is automatically saved to GitHub Gists when you mark problems as complete.
               </p>
-              {lastBackup && (
-                <p className="text-emerald-500 dark:text-emerald-500 text-xs mt-2">
-                  Last backup: {new Date(lastBackup).toLocaleString()}
-                </p>
-              )}
             </div>
 
             {importError && (
@@ -578,7 +751,6 @@ const Dashboard = () => {
             )}
 
             <div className="space-y-3">
-              {/* Export options */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3">
                 <button
                   onClick={handleExport}
@@ -596,7 +768,6 @@ const Dashboard = () => {
                 </button>
               </div>
 
-              {/* Restore from file */}
               <input
                 type="file"
                 ref={restoreInputRef}
@@ -611,39 +782,12 @@ const Dashboard = () => {
                 <RotateCcw size={18} />
                 Restore from Backup File
               </button>
-
-              {/* Previous backups */}
-              {backups.length > 0 && (
-                <div className="mt-4">
-                  <h4 className="text-sm font-semibold text-gray-600 dark:text-gray-400 mb-2">Previous Auto-Backups</h4>
-                  <div className="space-y-2 max-h-40 overflow-y-auto">
-                    {backups.slice(0, 5).map((backup, idx) => (
-                      <button
-                        key={backup.id}
-                        onClick={() => handleRestoreFromBackup(backup)}
-                        className="w-full flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 rounded-lg transition-colors text-left"
-                      >
-                        <div>
-                          <p className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                            {new Date(backup.timestamp).toLocaleDateString()}
-                          </p>
-                          <p className="text-xs text-gray-500 dark:text-gray-400">
-                            {backup.profile?.name || 'Unknown'} • {Object.keys(backup.progress?.completedProblems || {}).length} patterns
-                          </p>
-                        </div>
-                        <RotateCcw size={16} className="text-gray-400 dark:text-gray-500" />
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              )}
             </div>
 
-            {/* Tip */}
             <div className="mt-6 p-3 bg-blue-50 dark:bg-blue-900/30 rounded-xl border border-blue-100 dark:border-blue-800">
               <p className="text-xs text-blue-700 dark:text-blue-300">
-                💡 <strong>Tip:</strong> Download a backup file and save it to cloud storage (Google Drive, Dropbox) 
-                for permanent safekeeping. You can restore from this file anytime, even on a different device.
+                💡 <strong>Tip:</strong> Your progress is automatically synced to GitHub Gists. Local backups are still 
+                available for extra safety.
               </p>
             </div>
           </div>
@@ -780,7 +924,12 @@ const LeaderboardRow = ({ rank, member, onRemove }) => {
           {rankIcons[rank] || rank}
         </div>
         <div className="flex-1 min-w-0 sm:flex-initial">
-          <p className="font-semibold text-gray-800 dark:text-gray-200 text-sm sm:text-base truncate">{member.name}</p>
+          <p className="font-semibold text-gray-800 dark:text-gray-200 text-sm sm:text-base truncate flex items-center gap-2">
+            {member.name}
+            {member.isRemote && (
+              <Cloud size={14} className="text-blue-400" title="Cloud user" />
+            )}
+          </p>
           <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">
             {member.totalCompleted} problems solved
           </p>

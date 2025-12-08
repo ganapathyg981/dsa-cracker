@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { BookOpen, GitBranch, LayoutDashboard, Rocket, Menu, X, Moon, Sun } from 'lucide-react';
+import { BookOpen, GitBranch, LayoutDashboard, Rocket, Menu, X, Moon, Sun, LogOut } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
 
-const NavigationTabs = ({ activeTab, onTabChange, onMobilePatternClick, currentPattern }) => {
+const NavigationTabs = ({ activeTab, onTabChange, onMobilePatternClick, currentPattern, onLogout }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { isDarkMode, toggleDarkMode } = useTheme();
   
@@ -37,6 +37,13 @@ const NavigationTabs = ({ activeTab, onTabChange, onMobilePatternClick, currentP
       description: 'Find the right pattern'
     }
   ];
+
+  const handleLogout = () => {
+    if (confirm('Are you sure you want to log out?')) {
+      onLogout?.();
+      setMobileMenuOpen(false);
+    }
+  };
 
   return (
     <>
@@ -118,6 +125,18 @@ const NavigationTabs = ({ activeTab, onTabChange, onMobilePatternClick, currentP
                 <Moon size={20} className="text-gray-600" />
               )}
             </button>
+
+            {/* Logout Button - Desktop */}
+            {onLogout && (
+              <button
+                onClick={handleLogout}
+                className="hidden lg:flex items-center gap-2 px-3 py-2 mr-2 text-sm font-medium text-gray-600 dark:text-gray-300 hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-red-600 dark:hover:text-red-400 rounded-lg active:scale-95 transition-all"
+                title="Log out"
+              >
+                <LogOut size={18} />
+                <span>Logout</span>
+              </button>
+            )}
 
             {/* Pattern Selector - Only show on mobile when in explorer tab */}
             {activeTab === 'explorer' && onMobilePatternClick && currentPattern && (
@@ -215,6 +234,19 @@ const NavigationTabs = ({ activeTab, onTabChange, onMobilePatternClick, currentP
                     )}
                   </button>
                 </div>
+
+                {/* Logout in Mobile Menu */}
+                {onLogout && (
+                  <div className="mt-2">
+                    <button
+                      onClick={handleLogout}
+                      className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all text-left"
+                    >
+                      <LogOut size={20} />
+                      <span className="font-medium">Log Out</span>
+                    </button>
+                  </div>
+                )}
               </nav>
 
               {/* Footer */}
@@ -232,4 +264,3 @@ const NavigationTabs = ({ activeTab, onTabChange, onMobilePatternClick, currentP
 };
 
 export default NavigationTabs;
-

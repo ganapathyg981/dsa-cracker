@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, createContext, useContext } from 'react';
 import { Routes, Route, Navigate, useNavigate, useLocation } from 'react-router-dom';
 import NavigationTabs from './components/NavigationTabs';
 import PatternExplorer from './components/PatternExplorer';
@@ -12,22 +12,33 @@ import LearningPath from './components/LearningPath';
 import { decisionTrees } from './data/decisionTrees';
 import { topics as legacyTopics } from './data/topics';
 import { topics } from './data/patterns';
-import { getUserProfile, setUserProfile } from './utils/storage';
+import { 
+  getCurrentUserId, 
+  getCurrentGistId,
+  setCurrentUser,
+  clearCurrentUser,
+  isLoggedIn,
+} from './utils/storage';
+import { getUserProgress, saveUserProgress, isConfigured } from './services/gistService';
 import './App.css';
 
-// Decision Tree Page Component
+// Create a context to share user data across the app
+export const UserDataContext = createContext(null);
+
+export function useUserData() {
+  return useContext(UserDataContext);
+}
+
 function DecisionTreePage() {
   const navigate = useNavigate();
   const location = useLocation();
   
-  // Extract topic from URL path
   const pathParts = location.pathname.split('/');
   const topicId = pathParts[2] || null;
   
   const [selectedPath, setSelectedPath] = useState([]);
   const [result, setResult] = useState(null);
 
-  // Reset state when topic changes
   useEffect(() => {
     setSelectedPath([]);
     setResult(null);
@@ -107,32 +118,110 @@ function DecisionTreePage() {
 function App() {
   const navigate = useNavigate();
   const location = useLocation();
-  const [userProfile, setProfile] = useState(null);
+  const [userData, setUserData] = useState(null); // { profile, progress, goals }
   const [showWelcome, setShowWelcome] = useState(false);
   const [mobilePatternSelectorOpen, setMobilePatternSelectorOpen] = useState(false);
   const [currentPattern, setCurrentPattern] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [refreshKey, setRefreshKey] = useState(0);
 
-  useEffect(() => {
-    const profile = getUserProfile();
-    if (profile) {
-      setProfile(profile);
-    } else {
-      setShowWelcome(true);
+  // Load user data from Gist
+  const loadUserData = useCallback(async () => {
+    const userId = getCurrentUserId();
+    if (!userId || !isConfigured()) {
+      return null;
+    }
+
+    try {
+      const data = await getUserProgress(userId);
+      return data;
+    } catch (error) {
+      console.error('Error loading user data from Gist:', error);
+      return null;
     }
   }, []);
 
-  const handleWelcomeComplete = (profileData) => {
-    const profile = setUserProfile(profileData);
-    setProfile(profile);
+  // Save user data to Gist
+  const saveData = useCallback(async (newProgress, newGoals) => {
+    const userId = getCurrentUserId();
+    if (!userId || !isConfigured()) {
+      return false;
+    }
+
+    try {
+      await saveUserProgress(userId, {
+        profile: userData?.profile,
+        progress: newProgress,
+        goals: newGoals || userData?.goals,
+      });
+      
+      // Update local state
+      setUserData(prev => ({
+        ...prev,
+        progress: newProgress,
+        goals: newGoals || prev?.goals,
+      }));
+      
+      return true;
+    } catch (error) {
+      console.error('Error saving to Gist:', error);
+      return false;
+    }
+  }, [userData]);
+
+  // Initialize user
+  const initializeUser = useCallback(async () => {
+    setIsLoading(true);
+
+    try {
+      if (isLoggedIn() && isConfigured()) {
+        const data = await loadUserData();
+        if (data) {
+          setUserData(data);
+        } else {
+          // User was logged in but data not found - show welcome
+          clearCurrentUser();
+          setShowWelcome(true);
+        }
+      } else {
+        setShowWelcome(true);
+      }
+    } catch (error) {
+      console.error('Error initializing user:', error);
+      setShowWelcome(true);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [loadUserData]);
+
+  useEffect(() => {
+    initializeUser();
+  }, [initializeUser, refreshKey]);
+
+  const handleWelcomeComplete = (data) => {
+    setCurrentUser(data.userId, data.gistId);
+    
+    setUserData({
+      profile: data.profile,
+      progress: data.progress,
+      goals: data.goals,
+    });
+    
     setShowWelcome(false);
   };
 
-  // Handler to navigate to pattern explorer with a specific pattern
+  const handleLogout = () => {
+    clearCurrentUser();
+    setUserData(null);
+    setShowWelcome(true);
+    setRefreshKey(k => k + 1);
+    navigate('/dashboard');
+  };
+
   const handleSelectPattern = (patternId) => {
     navigate(`/explorer/${patternId}`);
   };
 
-  // Determine active tab from current route
   const getActiveTab = () => {
     const path = location.pathname;
     if (path.startsWith('/explorer')) return 'explorer';
@@ -161,7 +250,6 @@ function App() {
     }
   };
 
-  // Update current pattern from URL
   useEffect(() => {
     const path = location.pathname;
     if (path.startsWith('/explorer/')) {
@@ -175,26 +263,47 @@ function App() {
     }
   }, [location.pathname]);
 
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gray-100 dark:bg-gray-900 flex items-center justify-center transition-colors">
+        <div className="text-center">
+          <div className="w-16 h-16 border-4 border-violet-200 border-t-violet-600 rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-gray-600 dark:text-gray-400">Loading your progress...</p>
+        </div>
+      </div>
+    );
+  }
+
+  const contextValue = {
+    userData,
+    setUserData,
+    saveData,
+    refreshData: () => setRefreshKey(k => k + 1),
+  };
+
   return (
-    <div className="min-h-screen bg-gray-100 dark:bg-gray-900 transition-colors">
-      <NavigationTabs 
-        activeTab={getActiveTab()} 
-        onTabChange={handleTabChange}
-        onMobilePatternClick={() => setMobilePatternSelectorOpen(true)}
-        currentPattern={currentPattern}
-      />
-      <Routes>
-        <Route path="/" element={<Navigate to="/dashboard" replace />} />
-        <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/learning-path" element={<LearningPath onSelectPattern={handleSelectPattern} />} />
-        <Route path="/explorer" element={<PatternExplorer onMobilePatternSelectorToggle={setMobilePatternSelectorOpen} />} />
-        <Route path="/explorer/:patternId" element={<PatternExplorer onMobilePatternSelectorToggle={setMobilePatternSelectorOpen} />} />
-        <Route path="/explorer/:patternId/:section" element={<PatternExplorer onMobilePatternSelectorToggle={setMobilePatternSelectorOpen} />} />
-        <Route path="/explorer/:patternId/:section/:problemName" element={<PatternExplorer onMobilePatternSelectorToggle={setMobilePatternSelectorOpen} />} />
-        <Route path="/decision-tree/*" element={<DecisionTreePage />} />
-      </Routes>
-      {showWelcome && <WelcomeModal onComplete={handleWelcomeComplete} />}
-    </div>
+    <UserDataContext.Provider value={contextValue}>
+      <div className="min-h-screen bg-gray-100 dark:bg-gray-900 transition-colors">
+        <NavigationTabs 
+          activeTab={getActiveTab()} 
+          onTabChange={handleTabChange}
+          onMobilePatternClick={() => setMobilePatternSelectorOpen(true)}
+          currentPattern={currentPattern}
+          onLogout={handleLogout}
+        />
+        <Routes>
+          <Route path="/" element={<Navigate to="/dashboard" replace />} />
+          <Route path="/dashboard" element={<Dashboard key={refreshKey} />} />
+          <Route path="/learning-path" element={<LearningPath onSelectPattern={handleSelectPattern} />} />
+          <Route path="/explorer" element={<PatternExplorer onMobilePatternSelectorToggle={setMobilePatternSelectorOpen} />} />
+          <Route path="/explorer/:patternId" element={<PatternExplorer onMobilePatternSelectorToggle={setMobilePatternSelectorOpen} />} />
+          <Route path="/explorer/:patternId/:section" element={<PatternExplorer onMobilePatternSelectorToggle={setMobilePatternSelectorOpen} />} />
+          <Route path="/explorer/:patternId/:section/:problemName" element={<PatternExplorer onMobilePatternSelectorToggle={setMobilePatternSelectorOpen} />} />
+          <Route path="/decision-tree/*" element={<DecisionTreePage />} />
+        </Routes>
+        {showWelcome && <WelcomeModal onComplete={handleWelcomeComplete} />}
+      </div>
+    </UserDataContext.Provider>
   );
 }
 
