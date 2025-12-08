@@ -1,8 +1,11 @@
 import React, { useState } from 'react';
-import { BookOpen, GitBranch, LayoutDashboard, Rocket, Menu, X } from 'lucide-react';
+import { BookOpen, GitBranch, LayoutDashboard, Rocket, Menu, X, Moon, Sun } from 'lucide-react';
+import { useTheme } from '../context/ThemeContext';
 
 const NavigationTabs = ({ activeTab, onTabChange, onMobilePatternClick, currentPattern }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const { isDarkMode, toggleDarkMode } = useTheme();
+  
   const tabs = [
     { 
       id: 'dashboard', 
@@ -37,16 +40,16 @@ const NavigationTabs = ({ activeTab, onTabChange, onMobilePatternClick, currentP
 
   return (
     <>
-      <div className="bg-white border-b border-gray-200 sticky top-0 z-40 shadow-sm">
+      <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 sticky top-0 z-40 shadow-sm transition-colors">
         <div className="max-w-7xl mx-auto">
           <div className="flex items-center">
             {/* Mobile Hamburger Menu */}
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="lg:hidden p-3 hover:bg-gray-100 active:scale-95 transition-all"
+              className="lg:hidden p-3 hover:bg-gray-100 dark:hover:bg-gray-700 active:scale-95 transition-all"
               aria-label="Menu"
             >
-              <Menu size={24} className="text-gray-700" />
+              <Menu size={24} className="text-gray-700 dark:text-gray-300" />
             </button>
 
             {/* Desktop Navigation */}
@@ -62,8 +65,8 @@ const NavigationTabs = ({ activeTab, onTabChange, onMobilePatternClick, currentP
                     className={`
                       group relative flex items-center gap-2 px-6 py-3 text-sm font-semibold rounded-lg transition-all whitespace-nowrap flex-shrink-0
                       ${isActive 
-                        ? 'bg-gradient-to-r from-blue-500 to-indigo-500 text-white shadow-lg shadow-blue-200' 
-                        : 'text-gray-600 hover:bg-gray-100 active:scale-95'
+                        ? 'bg-gradient-to-r from-blue-500 to-indigo-500 text-white shadow-lg shadow-blue-200 dark:shadow-blue-900/50' 
+                        : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 active:scale-95'
                       }
                     `}
                     aria-current={isActive ? 'page' : undefined}
@@ -90,8 +93,8 @@ const NavigationTabs = ({ activeTab, onTabChange, onMobilePatternClick, currentP
                 const Icon = tab.icon;
                 return (
                   <div key={tab.id} className="flex items-center gap-2">
-                    <Icon size={18} className="text-blue-500" />
-                    <span className="font-semibold text-gray-800">{tab.shortLabel}</span>
+                    <Icon size={18} className="text-blue-500 dark:text-blue-400" />
+                    <span className="font-semibold text-gray-800 dark:text-gray-200">{tab.shortLabel}</span>
                     {tab.isNew && (
                       <span className="px-1.5 py-0.5 bg-gradient-to-r from-orange-500 to-pink-500 text-white text-[9px] font-bold rounded-full shadow-sm">
                         NEW
@@ -101,6 +104,20 @@ const NavigationTabs = ({ activeTab, onTabChange, onMobilePatternClick, currentP
                 );
               })}
             </div>
+
+            {/* Dark Mode Toggle - Desktop & Mobile */}
+            <button
+              onClick={toggleDarkMode}
+              className="p-3 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg active:scale-95 transition-all"
+              aria-label="Toggle dark mode"
+              title={isDarkMode ? 'Switch to light mode' : 'Switch to dark mode'}
+            >
+              {isDarkMode ? (
+                <Sun size={20} className="text-yellow-500" />
+              ) : (
+                <Moon size={20} className="text-gray-600" />
+              )}
+            </button>
 
             {/* Pattern Selector - Only show on mobile when in explorer tab */}
             {activeTab === 'explorer' && onMobilePatternClick && currentPattern && (
@@ -129,16 +146,16 @@ const NavigationTabs = ({ activeTab, onTabChange, onMobilePatternClick, currentP
           />
           
           {/* Menu Panel */}
-          <div className="lg:hidden fixed top-0 left-0 bottom-0 w-72 bg-white z-50 shadow-2xl transform transition-transform duration-300 ease-out">
+          <div className="lg:hidden fixed top-0 left-0 bottom-0 w-72 bg-white dark:bg-gray-800 z-50 shadow-2xl transform transition-transform duration-300 ease-out">
             <div className="flex flex-col h-full">
               {/* Header */}
-              <div className="flex items-center justify-between p-4 border-b border-gray-200">
-                <h2 className="text-lg font-bold text-gray-800">Navigation</h2>
+              <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
+                <h2 className="text-lg font-bold text-gray-800 dark:text-gray-200">Navigation</h2>
                 <button
                   onClick={() => setMobileMenuOpen(false)}
-                  className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                  className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
                 >
-                  <X size={20} className="text-gray-600" />
+                  <X size={20} className="text-gray-600 dark:text-gray-400" />
                 </button>
               </div>
 
@@ -160,13 +177,13 @@ const NavigationTabs = ({ activeTab, onTabChange, onMobilePatternClick, currentP
                           w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all text-left
                           ${isActive 
                             ? 'bg-gradient-to-r from-blue-500 to-indigo-500 text-white shadow-lg' 
-                            : 'text-gray-700 hover:bg-gray-100 active:scale-98'
+                            : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 active:scale-98'
                           }
                         `}
                       >
                         <Icon 
                           size={20} 
-                          className={isActive ? 'text-white' : 'text-gray-400'} 
+                          className={isActive ? 'text-white' : 'text-gray-400 dark:text-gray-500'} 
                         />
                         <span className="font-medium">{tab.label}</span>
                         {tab.isNew && (
@@ -178,11 +195,31 @@ const NavigationTabs = ({ activeTab, onTabChange, onMobilePatternClick, currentP
                     );
                   })}
                 </div>
+
+                {/* Dark Mode Toggle in Mobile Menu */}
+                <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+                  <button
+                    onClick={toggleDarkMode}
+                    className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-all text-left"
+                  >
+                    {isDarkMode ? (
+                      <>
+                        <Sun size={20} className="text-yellow-500" />
+                        <span className="font-medium">Light Mode</span>
+                      </>
+                    ) : (
+                      <>
+                        <Moon size={20} className="text-gray-400" />
+                        <span className="font-medium">Dark Mode</span>
+                      </>
+                    )}
+                  </button>
+                </div>
               </nav>
 
               {/* Footer */}
-              <div className="p-4 border-t border-gray-200 bg-gray-50">
-                <p className="text-xs text-gray-500 text-center">
+              <div className="p-4 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900">
+                <p className="text-xs text-gray-500 dark:text-gray-400 text-center">
                   DSA Pattern System
                 </p>
               </div>

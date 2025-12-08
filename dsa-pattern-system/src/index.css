@@ -20,6 +20,11 @@ body {
   margin: 0;
   min-height: 100vh;
   background: #f9fafb;
+  transition: background-color 0.3s ease;
+}
+
+body.dark {
+  background: #111827;
 }
 
 #root {
@@ -37,13 +42,25 @@ body {
   background: #f1f1f1;
 }
 
+.dark ::-webkit-scrollbar-track {
+  background: #1f2937;
+}
+
 ::-webkit-scrollbar-thumb {
   background: #c1c1c1;
   border-radius: 4px;
 }
 
+.dark ::-webkit-scrollbar-thumb {
+  background: #4b5563;
+}
+
 ::-webkit-scrollbar-thumb:hover {
   background: #a1a1a1;
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: #6b7280;
 }
 
 /* Code styling */
@@ -68,6 +85,11 @@ input:focus-visible {
 ::selection {
   background: #bfdbfe;
   color: #1e3a8a;
+}
+
+.dark ::selection {
+  background: #3b82f6;
+  color: #ffffff;
 }
 
 /* Pattern detail code blocks */

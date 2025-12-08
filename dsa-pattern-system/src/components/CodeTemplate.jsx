@@ -21,7 +21,7 @@ const CodeTemplate = ({ template, index }) => {
   const getLanguage = () => activeLanguage === 'java' ? 'java' : 'python';
 
   return (
-    <div className="border border-gray-200 rounded-xl overflow-hidden shadow-sm bg-white">
+    <div className="border border-gray-200 dark:border-gray-700 rounded-xl overflow-hidden shadow-sm bg-white dark:bg-gray-800">
       {/* Header */}
       <div className="bg-gradient-to-r from-slate-800 to-slate-900 px-3 sm:px-5 py-3 sm:py-4">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-4">
@@ -118,28 +118,28 @@ const CodeTemplate = ({ template, index }) => {
 
       {/* Test Case */}
       {template.testCase && (
-        <div className="border-t border-gray-200 bg-gradient-to-r from-slate-50 to-gray-50 px-5 py-4">
+        <div className="border-t border-gray-200 dark:border-gray-700 bg-gradient-to-r from-slate-50 to-gray-50 dark:from-gray-800 dark:to-gray-800 px-5 py-4">
           <div className="flex items-start gap-3">
-            <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0">
-              <Play size={16} className="text-green-600" />
+            <div className="w-8 h-8 bg-green-100 dark:bg-green-900/40 rounded-lg flex items-center justify-center flex-shrink-0">
+              <Play size={16} className="text-green-600 dark:text-green-400" />
             </div>
             <div className="space-y-2 text-sm flex-1">
               <div className="flex items-center gap-2">
-                <span className="font-medium text-gray-700 w-16">Input:</span>
-                <code className="bg-slate-200 px-2.5 py-1 rounded-lg text-slate-800 font-mono text-xs">
+                <span className="font-medium text-gray-700 dark:text-gray-300 w-16">Input:</span>
+                <code className="bg-slate-200 dark:bg-slate-700 px-2.5 py-1 rounded-lg text-slate-800 dark:text-slate-200 font-mono text-xs">
                   {template.testCase.input}
                 </code>
               </div>
               <div className="flex items-center gap-2">
-                <span className="font-medium text-gray-700 w-16">Output:</span>
-                <code className="bg-green-100 px-2.5 py-1 rounded-lg text-green-800 font-mono text-xs font-bold">
+                <span className="font-medium text-gray-700 dark:text-gray-300 w-16">Output:</span>
+                <code className="bg-green-100 dark:bg-green-900/40 px-2.5 py-1 rounded-lg text-green-800 dark:text-green-300 font-mono text-xs font-bold">
                   {template.testCase.output}
                 </code>
               </div>
               {template.testCase.explanation && (
-                <div className="flex items-start gap-2 mt-2 p-2 bg-amber-50 rounded-lg border border-amber-100">
-                  <span className="text-amber-500">💡</span>
-                  <span className="text-gray-600 text-xs">{template.testCase.explanation}</span>
+                <div className="flex items-start gap-2 mt-2 p-2 bg-amber-50 dark:bg-amber-900/30 rounded-lg border border-amber-100 dark:border-amber-700">
+                  <span className="text-amber-500 dark:text-amber-400">💡</span>
+                  <span className="text-gray-600 dark:text-gray-400 text-xs">{template.testCase.explanation}</span>
                 </div>
               )}
             </div>

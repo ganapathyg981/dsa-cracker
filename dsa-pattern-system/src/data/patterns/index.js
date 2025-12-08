@@ -18,6 +18,7 @@ import { monotonicStack } from './monotonic-stack';
 import { tries } from './tries';
 import { segmentTrees } from './segment-trees';
 import { bitManipulation } from './bit-manipulation';
+import { getEnhancedProblems } from '../problemDetails';
 
 // All patterns organized by ID
 export const patterns = {
@@ -313,14 +314,21 @@ export const topics = [
   },
 ];
 
-// Get pattern by ID
+// Get pattern by ID with enhanced problems
 export function getPattern(id) {
-  return patterns[id] || null;
+  const pattern = patterns[id];
+  if (!pattern) return null;
+  
+  // Enhance problems with details from problemDetails.js
+  return {
+    ...pattern,
+    problems: getEnhancedProblems(pattern.problems || [])
+  };
 }
 
-// Get all available patterns
+// Get all available patterns with enhanced problems
 export function getAvailablePatterns() {
-  return topics.filter(t => t.available).map(t => patterns[t.id]).filter(Boolean);
+  return topics.filter(t => t.available).map(t => getPattern(t.id)).filter(Boolean);
 }
 
 // Get topics sorted by learning order (for guided learning path)
