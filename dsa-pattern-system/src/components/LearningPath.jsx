@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
   Rocket, BookOpen, Target, Layers, Zap, Trophy, 
@@ -6,16 +6,17 @@ import {
   ArrowRight, Clock, TrendingUp
 } from 'lucide-react';
 import { getAvailablePatterns } from '../data/patterns';
-import { getAllCompletedProblems } from '../utils/storage';
+import { useUserData } from '../App';
 
 const LearningPath = ({ onSelectPattern }) => {
   const navigate = useNavigate();
-  const [completedProblems, setCompletedProblems] = useState({});
+  const { userData } = useUserData();
   const [expandedPhase, setExpandedPhase] = useState('beginner');
   
-  useEffect(() => {
-    setCompletedProblems(getAllCompletedProblems());
-  }, []);
+  // Get completed problems from context
+  const completedProblems = useMemo(() => {
+    return userData?.progress?.completedProblems || {};
+  }, [userData?.progress?.completedProblems]);
 
   // Learning phases with recommended order
   const learningPhases = [
