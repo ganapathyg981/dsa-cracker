@@ -3,6 +3,78 @@ export const graphs = {
   title: 'Graphs',
   icon: '🕸️',
   difficulty: 'Medium-Hard',
+
+  // 🌟 BEGINNER-FRIENDLY INTRODUCTION
+  introduction: {
+    realWorldAnalogy: `Think of a social network like Facebook 👥:
+    
+• **People** = Nodes (vertices)
+• **Friendships** = Edges (connections)
+• "Friends of friends" = Traversing the graph
+
+Or imagine a city map 🗺️:
+• **Cities** = Nodes
+• **Roads** = Edges
+• **Distances** = Edge weights
+
+Finding the shortest route from city A to city B? That's a graph problem!`,
+
+    simpleExplanation: `A graph is a collection of **nodes** (vertices) connected by **edges**. It's perfect for representing relationships and connections.
+
+**Types of graphs:**
+• **Directed** (one-way streets) vs **Undirected** (two-way streets)
+• **Weighted** (roads have distances) vs **Unweighted** (all edges equal)
+• **Cyclic** (can go in circles) vs **Acyclic** (no cycles, like a tree)
+
+**Key algorithms:**
+• **BFS** - Shortest path in unweighted graph
+• **DFS** - Explore all paths, detect cycles
+• **Dijkstra** - Shortest path in weighted graph`,
+
+    visualSteps: [
+      { step: 1, title: 'Represent the Graph', description: 'Use adjacency list (most common) or matrix', visual: 'graph = {A: [B,C], B: [A,D], C: [A], D: [B]}' },
+      { step: 2, title: 'Track Visited', description: 'Prevent infinite loops in cycles', visual: 'visited = set() or boolean[] visited' },
+      { step: 3, title: 'Choose Algorithm', description: 'BFS for shortest, DFS for exploration', visual: 'Shortest path → BFS, All paths → DFS' },
+      { step: 4, title: 'Traverse', description: 'Visit neighbors, mark visited, repeat', visual: 'for neighbor in graph[node]: visit(neighbor)' },
+      { step: 5, title: 'Extract Answer', description: 'Distance, path, component count, etc.', visual: 'Return what problem asks for' },
+    ],
+
+    keyTakeaway: '💡 Graphs = Nodes + Edges. Use BFS for shortest path (unweighted), Dijkstra for weighted. Always track visited nodes!',
+  },
+
+  // 🎯 PATTERN RECOGNITION SIGNALS
+  recognitionSignals: {
+    keyPhrases: [
+      'network',
+      'connected',
+      'shortest path',
+      'reach from A to B',
+      'relationships',
+      'dependencies',
+      'friends of friends',
+      'route finding',
+    ],
+    problemCharacteristics: [
+      'Data has connections/relationships between entities',
+      'Need to find if two things are connected',
+      'Finding shortest/cheapest path between nodes',
+      'Counting connected groups (components)',
+      'Detecting cycles in relationships',
+    ],
+    notSuitableWhen: [
+      'Data is strictly hierarchical (use Tree instead)',
+      'No relationships between data points',
+      'Simple linear traversal needed',
+    ],
+  },
+
+  // 🔗 RELATED PATTERNS
+  relatedPatterns: [
+    { id: 'bfs-dfs', relationship: 'BFS/DFS are the core traversal algorithms for graphs' },
+    { id: 'trees', relationship: 'Trees are acyclic connected graphs' },
+    { id: 'topological-sort', relationship: 'Topological sort works on directed acyclic graphs (DAGs)' },
+    { id: 'union-find', relationship: 'Union-Find efficiently tracks connected components' },
+  ],
   
   theory: {
     overview: `Graphs consist of vertices (nodes) connected by edges. They can be directed/undirected, weighted/unweighted, cyclic/acyclic. Representation matters: adjacency list for sparse graphs, matrix for dense.

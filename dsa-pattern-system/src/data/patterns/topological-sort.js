@@ -3,6 +3,69 @@ export const topologicalSort = {
   title: 'Topological Sort',
   icon: '📋',
   difficulty: 'Medium',
+
+  // 🌟 BEGINNER-FRIENDLY INTRODUCTION
+  introduction: {
+    realWorldAnalogy: `Think about getting dressed in the morning 👔:
+
+You can't put on shoes before socks, or a shirt before your underwear. There's a **dependency order**:
+1. Underwear → Pants (underwear first)
+2. Socks → Shoes (socks first)  
+3. Shirt → Jacket (shirt first)
+
+**Topological sort** finds a valid order respecting all dependencies. It's like: "In what order should I complete tasks so prerequisites are done first?"`,
+
+    simpleExplanation: `Topological Sort orders nodes in a **Directed Acyclic Graph (DAG)** so that for every edge A→B, A comes before B.
+
+**Key insight:** Start with nodes that have **no dependencies** (indegree = 0).
+
+**Kahn's Algorithm (BFS):**
+1. Count incoming edges (indegree) for each node
+2. Add all indegree-0 nodes to queue
+3. Process queue: for each node, reduce neighbors' indegree
+4. Add newly indegree-0 nodes to queue
+5. If result has fewer nodes than graph → **cycle exists!**`,
+
+    visualSteps: [
+      { step: 1, title: 'Build Graph', description: 'Create adjacency list from edges', visual: 'prereq [0,1] → graph[0].add(1)' },
+      { step: 2, title: 'Count Indegrees', description: 'How many edges point TO each node', visual: 'indegree[1] = 2 means 2 prerequisites' },
+      { step: 3, title: 'Start with Indegree 0', description: 'These have no dependencies', visual: 'queue.add(all nodes with indegree 0)' },
+      { step: 4, title: 'Process & Reduce', description: 'Take from queue, reduce neighbor indegrees', visual: 'for each neighbor: indegree[neighbor]--' },
+      { step: 5, title: 'Detect Cycle', description: 'If result.size < n, cycle exists!', visual: 'return result.size == n ? order : []' },
+    ],
+
+    keyTakeaway: '💡 Topological Sort = Process nodes with no remaining dependencies first. If you can\'t process all nodes, there\'s a cycle!',
+  },
+
+  // 🎯 PATTERN RECOGNITION SIGNALS
+  recognitionSignals: {
+    keyPhrases: [
+      'course prerequisites',
+      'task dependencies',
+      'build order',
+      'valid sequence',
+      'ordering constraints',
+      'what order to complete',
+    ],
+    problemCharacteristics: [
+      'Tasks with dependencies/prerequisites',
+      'Need to find valid ordering',
+      'Detect if ordering is possible (cycle detection)',
+      'Directed graph with dependencies',
+    ],
+    notSuitableWhen: [
+      'Graph has cycles (no valid ordering exists)',
+      'Undirected graph (use BFS/DFS instead)',
+      'No ordering constraints',
+    ],
+  },
+
+  // 🔗 RELATED PATTERNS
+  relatedPatterns: [
+    { id: 'bfs-dfs', relationship: 'Kahn\'s uses BFS, alternative uses DFS post-order' },
+    { id: 'graphs', relationship: 'Topological sort is a graph algorithm for DAGs' },
+    { id: 'dynamic-programming', relationship: 'DP on DAGs processes nodes in topological order' },
+  ],
   
   theory: {
     overview: `Topological sort orders vertices in a DAG (Directed Acyclic Graph) such that for every edge u→v, u comes before v. It's used for dependency resolution, task scheduling, and build systems.

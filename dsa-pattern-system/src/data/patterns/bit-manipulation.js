@@ -3,6 +3,84 @@ export const bitManipulation = {
   title: 'Bit Manipulation',
   icon: '⚡',
   difficulty: 'Medium',
+
+  // 🌟 BEGINNER-FRIENDLY INTRODUCTION
+  introduction: {
+    realWorldAnalogy: `Think of a row of light switches 💡:
+
+Each switch is either ON (1) or OFF (0). That's binary!
+
+**Number 13 in binary:** 1101 (8+4+0+1)
+• 4 switches, positions 3,2,1,0
+• Switches at positions 3,2,0 are ON
+
+**Bit operations = Manipulating switches:**
+• AND (&): Both ON → ON
+• OR (|): Either ON → ON  
+• XOR (^): Different → ON (same → OFF)`,
+
+    simpleExplanation: `Bit Manipulation operates directly on binary representations. It's fast (O(1)) and memory-efficient.
+
+**Key Operations:**
+• **AND (&)**: 1 & 1 = 1, else 0  — "Both must be 1"
+• **OR (|)**: 0 | 0 = 0, else 1  — "At least one is 1"
+• **XOR (^)**: Same = 0, Different = 1 — "Toggle/cancel"
+• **NOT (~)**: Flip all bits
+• **Shift (<<, >>)**: Multiply/divide by 2
+
+**Magic XOR Properties:**
+• a ^ a = 0 (same values cancel!)
+• a ^ 0 = a (identity)
+• XOR is commutative and associative`,
+
+    visualSteps: [
+      { step: 1, title: 'Single Number (XOR)', description: 'XOR all elements, duplicates cancel', visual: '[4,1,2,1,2] → 4^1^2^1^2 = 4' },
+      { step: 2, title: 'Check Bit Set', description: 'AND with mask', visual: '(n & (1 << i)) != 0 → bit i is set' },
+      { step: 3, title: 'Set Bit', description: 'OR with mask', visual: 'n | (1 << i) → set bit i to 1' },
+      { step: 4, title: 'Clear Bit', description: 'AND with inverted mask', visual: 'n & ~(1 << i) → clear bit i' },
+      { step: 5, title: 'Count Bits', description: 'Remove lowest bit until 0', visual: 'while(n): count++; n &= (n-1)' },
+    ],
+
+    keyTakeaway: '💡 XOR is magical: a^a=0 cancels duplicates. n&(n-1) removes lowest set bit. Bit ops are O(1) and super fast!',
+  },
+
+  // 🎯 PATTERN RECOGNITION SIGNALS
+  recognitionSignals: {
+    keyPhrases: [
+      'single number',
+      'missing number',
+      'power of two',
+      'count bits',
+      'hamming distance',
+      'subsets using bitmask',
+      'XOR',
+    ],
+    problemCharacteristics: [
+      'Finding single/missing element among pairs',
+      'Checking power of 2, 4, etc.',
+      'Counting set bits',
+      'Generating subsets efficiently',
+      'Space optimization needed',
+    ],
+    commonTricks: [
+      { trick: 'n & (n-1)', effect: 'Removes lowest set bit' },
+      { trick: 'n & (-n)', effect: 'Isolates lowest set bit' },
+      { trick: 'n & (n-1) == 0', effect: 'Check if power of 2' },
+      { trick: 'a ^ b ^ a == b', effect: 'XOR cancels duplicates' },
+    ],
+    notSuitableWhen: [
+      'Need more than 32/64 items (bitmask limit)',
+      'Non-integer operations',
+      'Readability is priority over performance',
+    ],
+  },
+
+  // 🔗 RELATED PATTERNS
+  relatedPatterns: [
+    { id: 'backtracking', relationship: 'Bitmask can represent subsets for DP/backtracking' },
+    { id: 'dynamic-programming', relationship: 'Bitmask DP for subset problems (TSP, assignment)' },
+    { id: 'arrays-strings', relationship: 'Bit manipulation for efficient array operations' },
+  ],
   
   theory: {
     overview: `Bit manipulation operates directly on binary representations. Key operations: AND (&), OR (|), XOR (^), NOT (~), left shift (<<), right shift (>>).

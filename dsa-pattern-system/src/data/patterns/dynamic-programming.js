@@ -3,6 +3,91 @@ export const dynamicProgramming = {
   title: 'Dynamic Programming',
   icon: '💎',
   difficulty: 'Medium-Hard',
+
+  // 🌟 BEGINNER-FRIENDLY INTRODUCTION (inspired by Grokking the Coding Interview)
+  introduction: {
+    realWorldAnalogy: `Imagine you're climbing stairs 🪜 and want to count how many ways you can reach the top (taking 1 or 2 steps at a time):
+
+**Naive approach**: Count every possible path from scratch - SLOW!
+
+**Smart approach (DP)**: 
+"How many ways to reach step 5? Well, I can only get there from step 4 or step 3. So ways(5) = ways(4) + ways(3)!"
+
+Instead of recalculating from scratch, we BUILD on answers we already computed. That's the magic of Dynamic Programming - **remembering past work to avoid repeating it**.`,
+
+    simpleExplanation: `Dynamic Programming (DP) solves complex problems by breaking them into simpler subproblems. Two key ideas:
+
+1. **Overlapping Subproblems**: The same smaller problems appear repeatedly
+2. **Optimal Substructure**: The best solution is built from best solutions to subproblems
+
+**Two approaches to DP:**
+• **Top-Down (Memoization)**: Solve recursively, but CACHE results
+• **Bottom-Up (Tabulation)**: Build solution iteratively from smallest subproblems
+
+Start with recursion → add memoization → (optionally) convert to iteration`,
+
+    visualSteps: [
+      { step: 1, title: 'Brute Force First', description: 'Write recursive solution that works but may be slow', visual: 'fib(5) → fib(4)+fib(3) → fib(3)+fib(2)+...' },
+      { step: 2, title: 'Identify Repeats', description: 'Notice same subproblems solved multiple times', visual: 'fib(3) called 2x, fib(2) called 3x ❌' },
+      { step: 3, title: 'Add Memoization', description: 'Cache results to avoid re-computation', visual: 'memo[n] = result → lookup before computing ✓' },
+      { step: 4, title: 'Or Build Bottom-Up', description: 'Start from base cases, build up iteratively', visual: 'dp[0]=0, dp[1]=1, dp[2]=dp[0]+dp[1]...' },
+      { step: 5, title: 'Optimize Space', description: 'Often only need previous 1-2 states', visual: 'dp[n] = prev1 + prev2 → O(1) space!' },
+    ],
+
+    keyTakeaway: '💡 DP = Recursion + Memoization. First write the recursive brute force, then cache results. The hardest part is identifying the STATE (what changes between subproblems).',
+  },
+
+  // 🎯 PATTERN RECOGNITION SIGNALS
+  recognitionSignals: {
+    keyPhrases: [
+      'minimum/maximum',
+      'count number of ways',
+      'is it possible to...',
+      'longest/shortest subsequence',
+      'optimal solution',
+      'reach target sum',
+      'partition into subsets',
+      'distinct paths',
+    ],
+    problemCharacteristics: [
+      'Problem has optimal substructure (optimal solution built from optimal sub-solutions)',
+      'Same subproblems are solved multiple times (overlapping subproblems)',
+      'Need to make a series of decisions',
+      'Result is a single value (count, min, max, true/false) not the actual path/sequence',
+    ],
+    dpCategories: [
+      { name: '0/1 Knapsack', hint: 'Take or skip items with capacity constraint (Subset Sum, Partition Equal)' },
+      { name: 'Unbounded Knapsack', hint: 'Unlimited use of items (Coin Change, Rod Cutting)' },
+      { name: 'Fibonacci Numbers', hint: 'Current depends on previous 1-2 states (Climbing Stairs, House Robber)' },
+      { name: 'Longest Common Subsequence', hint: 'Compare two strings/sequences (LCS, Edit Distance)' },
+      { name: 'Palindrome', hint: 'Check/count palindromic subsequences/substrings' },
+      { name: 'Grid/Matrix', hint: 'Move through grid (Unique Paths, Min Path Sum)' },
+    ],
+    notSuitableWhen: [
+      'Problem requires the actual path/solution (not just the optimal value)',
+      'No overlapping subproblems (each subproblem solved once)',
+      'Greedy approach works (doesn\'t need to consider all options)',
+    ],
+  },
+
+  // 🔗 RELATED PATTERNS
+  relatedPatterns: [
+    { id: 'backtracking', relationship: 'Backtracking explores all paths; DP is better when paths overlap' },
+    { id: 'greedy', relationship: 'Greedy makes locally optimal choices; use DP when local optimal ≠ global optimal' },
+    { id: 'bfs-dfs', relationship: 'BFS/DFS explores graph; DP can optimize by caching visited states' },
+  ],
+
+  // 📋 5-STEP DP FRAMEWORK (from Educative)
+  framework: {
+    title: '5-Step DP Framework',
+    steps: [
+      { step: 1, name: 'Brute Force', description: 'Write a recursive solution that solves the problem correctly (even if slow)' },
+      { step: 2, name: 'Identify State', description: 'What variables uniquely define a subproblem? These become your DP state/dimensions' },
+      { step: 3, name: 'Memoization', description: 'Add a cache (hashmap/array) to store and reuse subproblem results' },
+      { step: 4, name: 'Bottom-Up', description: 'Convert to iterative by building from base cases up' },
+      { step: 5, name: 'Optimize Space', description: 'If only last 1-2 rows/states needed, reduce from O(n) to O(1)' },
+    ],
+  },
   
   theory: {
     overview: `Dynamic Programming solves problems by breaking them into overlapping subproblems, solving each once, and storing results. Two key properties: optimal substructure (optimal solution built from optimal sub-solutions) and overlapping subproblems (same subproblems recur).

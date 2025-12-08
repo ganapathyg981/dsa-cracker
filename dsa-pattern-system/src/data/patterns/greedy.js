@@ -3,6 +3,75 @@ export const greedy = {
   title: 'Greedy',
   icon: '🎯',
   difficulty: 'Medium-Hard',
+
+  // 🌟 BEGINNER-FRIENDLY INTRODUCTION
+  introduction: {
+    realWorldAnalogy: `You're at a buffet 🍽️ trying to get the most food on your plate (with limited space):
+
+**Greedy approach**: At each food station, take as much of the BEST food as you can fit, then move to the next.
+
+This works great for buffets! But it doesn't always work for all problems. If the best appetizer is too big, you might miss out on better main courses.
+
+**Greedy = Always make the locally optimal choice, hoping it leads to a globally optimal solution.**`,
+
+    simpleExplanation: `Greedy algorithms make the **best choice at each step** without looking ahead. Unlike Dynamic Programming (which considers all options), greedy commits immediately and never reconsiders.
+
+**When does greedy work?**
+1. **Greedy choice property**: Local optimum leads to global optimum
+2. **Optimal substructure**: Optimal solution contains optimal sub-solutions
+
+**Classic examples:**
+• Making change with US coins (25¢, 10¢, 5¢, 1¢) - greedy works!
+• Interval scheduling - pick earliest-ending event first
+• Fractional knapsack - take most valuable per weight first`,
+
+    visualSteps: [
+      { step: 1, title: 'Identify Greedy Choice', description: 'What local decision seems best?', visual: 'Sort by end time, value/weight, etc.' },
+      { step: 2, title: 'Verify It Works', description: 'Does local optimal = global optimal?', visual: 'Can you prove it or find counterexample?' },
+      { step: 3, title: 'Sort (Usually)', description: 'Greedy often needs sorted input', visual: 'Arrays.sort(intervals, by end time)' },
+      { step: 4, title: 'Process Greedily', description: 'Make best choice at each step', visual: 'for item: if fits, take it' },
+      { step: 5, title: 'No Backtracking', description: 'Once chosen, never reconsider', visual: 'Commit to choice, move forward' },
+    ],
+
+    keyTakeaway: '💡 Greedy is fast (O(n log n) typically) but only works when local optimal = global optimal. When unsure, verify with examples or use DP instead.',
+  },
+
+  // 🎯 PATTERN RECOGNITION SIGNALS
+  recognitionSignals: {
+    keyPhrases: [
+      'maximum activities',
+      'minimum meeting rooms',
+      'interval scheduling',
+      'gas station',
+      'jump game',
+      'can reach',
+      'assign tasks',
+    ],
+    problemCharacteristics: [
+      'Making a series of choices',
+      'Each choice has clear "best" option',
+      'Problem has optimal substructure',
+      'Sorting reveals the greedy strategy',
+    ],
+    greedyVsDp: [
+      'Greedy: Make best choice now, never reconsider',
+      'DP: Consider all choices, remember subproblem results',
+      'Greedy: Faster but only works for specific problems',
+      'DP: Slower but works when greedy fails',
+    ],
+    notSuitableWhen: [
+      'Local optimal ≠ global optimal (use DP)',
+      '0/1 Knapsack (can\'t take fractions)',
+      'Need to consider future consequences',
+    ],
+  },
+
+  // 🔗 RELATED PATTERNS
+  relatedPatterns: [
+    { id: 'dynamic-programming', relationship: 'Use DP when greedy doesn\'t work (need to consider all options)' },
+    { id: 'intervals', relationship: 'Many interval problems use greedy (sort by end time)' },
+    { id: 'heaps', relationship: 'Heaps help implement greedy efficiently (always get best option)' },
+  ],
   
   theory: {
     overview: `Greedy algorithms make locally optimal choices at each step, hoping to find a global optimum. The key is proving that local optima lead to global optimum (greedy choice property) and that the problem has optimal substructure.

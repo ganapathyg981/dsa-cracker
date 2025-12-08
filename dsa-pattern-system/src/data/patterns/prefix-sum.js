@@ -3,6 +3,76 @@ export const prefixSum = {
   title: 'Prefix Sum',
   icon: '➕',
   difficulty: 'Easy-Medium',
+
+  // 🌟 BEGINNER-FRIENDLY INTRODUCTION
+  introduction: {
+    realWorldAnalogy: `Imagine tracking your **daily bank balance** 🏦:
+
+Instead of recounting all transactions from day 1 every time, you record the running total each day. Now finding "how much did I spend between Tuesday and Friday" is just: balance[Friday] - balance[Monday].
+
+That's prefix sum! Store **cumulative totals** so any range query becomes a simple subtraction.`,
+
+    simpleExplanation: `Prefix Sum is a preprocessing technique that transforms range sum queries from O(n) to O(1).
+
+**The idea:**
+\`\`\`
+Original:  [2, 4, 6, 8, 10]
+Prefix:    [2, 6, 12, 20, 30]  // running totals
+\`\`\`
+
+**To find sum from index 1 to 3 (4+6+8=18):**
+\`\`\`
+prefix[3] - prefix[0] = 20 - 2 = 18 ✓
+\`\`\`
+
+**Formula:** sum(i, j) = prefix[j+1] - prefix[i]`,
+
+    visualSteps: [
+      { step: 1, title: 'Build Prefix Array', description: 'Calculate cumulative sums', visual: 'prefix[i] = prefix[i-1] + nums[i]' },
+      { step: 2, title: 'Handle Index 0', description: 'Prefix[0] = 0 or first element', visual: 'prefix = [0, 2, 6, 12, 20, 30] // extra 0' },
+      { step: 3, title: 'Answer Range Queries', description: 'Simple subtraction', visual: 'sum(i,j) = prefix[j+1] - prefix[i]' },
+      { step: 4, title: 'Combine with HashMap', description: 'For "subarray with sum K"', visual: 'prefix - K seen before? Found subarray!' },
+      { step: 5, title: 'Extend to 2D', description: 'Rectangle sums in matrices', visual: 'Include/exclude: +bottom_right -left -top +corner' },
+    ],
+
+    keyTakeaway: '💡 Prefix Sum trades O(n) space for O(1) range queries. Perfect for multiple range sum queries on static arrays!',
+  },
+
+  // 🎯 PATTERN RECOGNITION SIGNALS
+  recognitionSignals: {
+    keyPhrases: [
+      'range sum',
+      'subarray sum',
+      'sum between indices',
+      'sum equals k',
+      'divisible by k',
+      'contiguous sum',
+    ],
+    problemCharacteristics: [
+      'Multiple range sum queries on same array',
+      'Find subarray with specific sum',
+      'Count subarrays with sum property',
+      'Product of array except self',
+    ],
+    prefixSumPlusHashMap: [
+      'prefix[j] - prefix[i] = k → looking for prefix[i] = prefix[j] - k',
+      'Store prefix sums seen so far in HashMap',
+      'Check if (current_prefix - target) exists in HashMap',
+      'Used for: Subarray Sum Equals K, Contiguous Array, etc.',
+    ],
+    notSuitableWhen: [
+      'Array is modified frequently (use Segment Tree)',
+      'Only one range query needed (just sum directly)',
+      'Need max/min range queries (not sum)',
+    ],
+  },
+
+  // 🔗 RELATED PATTERNS
+  relatedPatterns: [
+    { id: 'sliding-window', relationship: 'Both handle contiguous subarrays; prefix sum allows negative numbers' },
+    { id: 'arrays-strings', relationship: 'Prefix sum is a preprocessing technique for arrays' },
+    { id: 'segment-trees', relationship: 'Segment trees handle range queries with updates' },
+  ],
   
   theory: {
     overview: `Prefix Sum (also called Cumulative Sum) is a preprocessing technique that allows O(1) range sum queries after O(n) preprocessing. Instead of summing elements each time, we precompute running totals.

@@ -229,6 +229,11 @@ export function getCompletedProblemsForPattern(patternId) {
   return progress.completedProblems[patternId] || {};
 }
 
+export function getAllCompletedProblems() {
+  const progress = getProgress();
+  return progress.completedProblems || {};
+}
+
 function updateStreak(progress) {
   const today = new Date().toISOString().split('T')[0];
   const streakData = progress.streakData;

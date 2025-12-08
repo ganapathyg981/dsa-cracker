@@ -41,72 +41,77 @@ const ProblemModal = ({ problem, patternId, onClose, onToggleComplete, isComplet
 
   return (
     <div 
-      className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fade-in"
+      className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[60] p-2 sm:p-4 animate-fade-in"
       onClick={(e) => e.target === e.currentTarget && onClose()}
     >
-      <div className="bg-white rounded-2xl shadow-2xl max-w-3xl w-full max-h-[90vh] overflow-hidden flex flex-col animate-scale-in">
+      <div className="bg-white rounded-xl sm:rounded-2xl shadow-2xl max-w-3xl w-full max-h-[92vh] sm:max-h-[88vh] overflow-hidden flex flex-col animate-scale-in">
         {/* Header */}
-        <div className="px-6 py-4 border-b border-gray-100 flex items-start justify-between bg-gradient-to-r from-slate-50 to-gray-50">
-          <div className="flex-1">
-            <div className="flex items-center gap-3 mb-2">
-              <span className={`px-3 py-1 text-sm font-medium rounded-lg border ${getDifficultyColor(problem.difficulty)}`}>
+        <div className="px-3 sm:px-6 py-3 sm:py-4 border-b border-gray-100 flex items-start justify-between bg-gradient-to-r from-slate-50 to-gray-50">
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2 sm:gap-3 mb-1.5 sm:mb-2 flex-wrap">
+              <span className={`px-2 sm:px-3 py-0.5 sm:py-1 text-xs sm:text-sm font-medium rounded-lg border ${getDifficultyColor(problem.difficulty)}`}>
                 {problem.difficulty}
               </span>
               {problem.category && (
-                <span className={`px-2 py-1 text-xs font-medium rounded-lg ${getCategoryColor(problem.category)}`}>
+                <span className={`px-1.5 sm:px-2 py-0.5 sm:py-1 text-[10px] sm:text-xs font-medium rounded-lg ${getCategoryColor(problem.category)}`}>
                   {problem.category}
                 </span>
               )}
               {problem.priority && (
-                <span className="flex items-center gap-1 text-xs text-gray-500">
-                  <Zap size={12} className="text-amber-500" />
-                  Priority {problem.priority}
+                <span className="flex items-center gap-1 text-[10px] sm:text-xs text-gray-500">
+                  <Zap size={10} className="sm:w-3 sm:h-3 text-amber-500" />
+                  P{problem.priority}
                 </span>
               )}
             </div>
-            <h2 className="text-xl font-bold text-gray-800 pr-8">{problem.name}</h2>
-            <div className="flex flex-wrap gap-2 mt-2">
-              {problem.tags?.map((tag, idx) => (
+            <h2 className="text-base sm:text-xl font-bold text-gray-800 pr-6 sm:pr-8 leading-tight">{problem.name}</h2>
+            <div className="flex flex-wrap gap-1.5 sm:gap-2 mt-1.5 sm:mt-2">
+              {problem.tags?.slice(0, 3).map((tag, idx) => (
                 <span 
                   key={idx}
-                  className="px-2 py-0.5 bg-gray-100 text-gray-600 text-xs rounded-md"
+                  className="px-1.5 sm:px-2 py-0.5 bg-gray-100 text-gray-600 text-[10px] sm:text-xs rounded-md"
                 >
                   {tag}
                 </span>
               ))}
+              {problem.tags?.length > 3 && (
+                <span className="px-1.5 sm:px-2 py-0.5 bg-gray-100 text-gray-600 text-[10px] sm:text-xs rounded-md">
+                  +{problem.tags.length - 3}
+                </span>
+              )}
             </div>
           </div>
           <button
             onClick={onClose}
-            className="p-2 hover:bg-gray-200 rounded-lg transition-colors"
+            className="p-1.5 sm:p-2 hover:bg-gray-200 rounded-lg transition-colors flex-shrink-0"
           >
-            <X size={20} className="text-gray-500" />
+            <X size={18} className="sm:w-5 sm:h-5 text-gray-500" />
           </button>
         </div>
 
         {/* Scrollable Content */}
-        <div className="flex-1 overflow-y-auto px-6 py-4 space-y-5">
+        <div className="flex-1 overflow-y-auto px-3 sm:px-6 py-3 sm:py-4 space-y-4 sm:space-y-5">
           {/* Problem Link */}
           {problem.leetcodeUrl && (
             <a
               href={problem.leetcodeUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-2 px-4 py-3 bg-gradient-to-r from-orange-50 to-amber-50 border border-orange-200 rounded-xl text-orange-700 hover:from-orange-100 hover:to-amber-100 transition-all group"
+              className="flex items-center gap-2 px-3 sm:px-4 py-2.5 sm:py-3 bg-gradient-to-r from-orange-50 to-amber-50 border border-orange-200 rounded-xl text-orange-700 hover:from-orange-100 hover:to-amber-100 transition-all group text-sm sm:text-base"
             >
-              <ExternalLink size={18} />
+              <ExternalLink size={16} className="sm:w-[18px] sm:h-[18px]" />
               <span className="font-medium">Open on LeetCode</span>
-              <ChevronRight size={16} className="ml-auto group-hover:translate-x-1 transition-transform" />
+              <ChevronRight size={14} className="sm:w-4 sm:h-4 ml-auto group-hover:translate-x-1 transition-transform" />
             </a>
           )}
 
           {/* Description */}
-          <div className="space-y-3">
-            <h3 className="flex items-center gap-2 font-semibold text-gray-800">
-              <BookOpen size={18} className="text-blue-500" />
+          <div className="space-y-2 sm:space-y-3">
+            <h3 className="flex items-center gap-2 font-semibold text-gray-800 text-sm sm:text-base">
+              <BookOpen size={16} className="sm:w-[18px] sm:h-[18px] text-blue-500" />
               Problem Description
             </h3>
-            <div className="p-4 bg-gray-50 rounded-xl text-gray-700 leading-relaxed">
+            <div className="p-3 sm:p-4 bg-gray-50 rounded-xl text-gray-700 leading-relaxed text-sm sm:text-base">
               {problem.description || (
                 <span className="text-gray-400 italic">
                   Click the LeetCode link above to view the full problem description.
@@ -262,17 +267,17 @@ const ProblemModal = ({ problem, patternId, onClose, onToggleComplete, isComplet
         </div>
 
         {/* Footer Actions */}
-        <div className="px-6 py-4 border-t border-gray-100 flex items-center justify-between bg-gray-50">
+        <div className="px-3 sm:px-6 py-3 sm:py-4 border-t border-gray-100 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2 sm:gap-4 bg-gray-50">
           <button
             onClick={() => onToggleComplete(problem.name)}
-            className={`flex items-center gap-2 px-4 py-2.5 rounded-xl font-medium transition-all ${
+            className={`flex items-center justify-center gap-2 px-3 sm:px-4 py-2 sm:py-2.5 rounded-xl font-medium transition-all text-sm sm:text-base ${
               isCompleted
                 ? 'bg-emerald-100 text-emerald-700 hover:bg-emerald-200'
                 : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
             }`}
           >
-            <Target size={18} />
-            {isCompleted ? 'Completed ✓' : 'Mark as Complete'}
+            <Target size={16} className="sm:w-[18px] sm:h-[18px]" />
+            {isCompleted ? 'Completed ✓' : 'Mark Complete'}
           </button>
           
           {problem.leetcodeUrl && (
@@ -280,9 +285,9 @@ const ProblemModal = ({ problem, patternId, onClose, onToggleComplete, isComplet
               href={problem.leetcodeUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-violet-600 to-indigo-600 text-white rounded-xl font-medium hover:from-violet-700 hover:to-indigo-700 transition-all shadow-lg shadow-violet-200"
+              className="flex items-center justify-center gap-2 px-3 sm:px-4 py-2 sm:py-2.5 bg-gradient-to-r from-violet-600 to-indigo-600 text-white rounded-xl font-medium hover:from-violet-700 hover:to-indigo-700 transition-all shadow-lg shadow-violet-200 text-sm sm:text-base"
             >
-              <ExternalLink size={18} />
+              <ExternalLink size={16} className="sm:w-[18px] sm:h-[18px]" />
               Solve on LeetCode
             </a>
           )}

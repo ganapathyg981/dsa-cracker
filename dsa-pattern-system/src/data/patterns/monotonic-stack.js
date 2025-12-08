@@ -3,6 +3,74 @@ export const monotonicStack = {
   title: 'Monotonic Stack/Queue',
   icon: '📚',
   difficulty: 'Medium-Hard',
+
+  // 🌟 BEGINNER-FRIENDLY INTRODUCTION
+  introduction: {
+    realWorldAnalogy: `Imagine you're in a crowd looking at a stage 🎭:
+
+**"Who's the next taller person?"** You look at people in front of you. The moment you see someone taller, that's your answer!
+
+A **monotonic decreasing stack** works the same way: keep only people who could potentially be "the next taller" for someone behind them. When a taller person arrives, shorter people in front become irrelevant!`,
+
+    simpleExplanation: `A Monotonic Stack maintains elements in sorted order (all increasing OR all decreasing).
+
+**How it works:**
+When adding a new element, **pop all elements that break the monotonic property**. What you pop gives you answers!
+
+**Example: Next Greater Element**
+- Use decreasing stack (top is smallest)
+- When nums[i] > stack.top(), pop! The popped element's "next greater" is nums[i]
+- Push nums[i]
+
+**Key insight:** Each element is pushed and popped at most once → O(n) total!`,
+
+    visualSteps: [
+      { step: 1, title: 'Choose Stack Type', description: 'Decreasing for "next greater", Increasing for "next smaller"', visual: 'Next Greater → Decreasing Stack' },
+      { step: 2, title: 'Process Each Element', description: 'Compare with stack top', visual: 'while stack and nums[i] > stack.top():' },
+      { step: 3, title: 'Pop and Record', description: 'Popped element found its answer!', visual: 'popped = stack.pop(); answer[popped] = nums[i]' },
+      { step: 4, title: 'Push Current', description: 'Add current element to stack', visual: 'stack.push(i) // push index, not value' },
+      { step: 5, title: 'Handle Remaining', description: 'Elements left in stack have no answer', visual: 'remaining elements → answer is -1 or n' },
+    ],
+
+    keyTakeaway: '💡 Monotonic Stack finds "next greater/smaller" in O(n). Each element enters and exits stack at most once!',
+  },
+
+  // 🎯 PATTERN RECOGNITION SIGNALS
+  recognitionSignals: {
+    keyPhrases: [
+      'next greater element',
+      'next smaller element',
+      'previous greater',
+      'previous smaller',
+      'daily temperatures',
+      'stock span',
+      'largest rectangle histogram',
+      'sliding window maximum',
+    ],
+    problemCharacteristics: [
+      'Finding next/previous greater/smaller element',
+      'Histogram-type problems',
+      'Stock span (how many consecutive days)',
+      'Sliding window max/min',
+      'Subarray contribution counting',
+    ],
+    stackTypes: [
+      { type: 'Decreasing', use: 'Next Greater Element (pop when current > top)' },
+      { type: 'Increasing', use: 'Next Smaller Element (pop when current < top)' },
+      { type: 'Monotonic Deque', use: 'Sliding Window Maximum (add to back, remove from front)' },
+    ],
+    notSuitableWhen: [
+      'Need just the overall min/max (use simple variable)',
+      'Random access needed (use sorted structure)',
+    ],
+  },
+
+  // 🔗 RELATED PATTERNS
+  relatedPatterns: [
+    { id: 'sliding-window', relationship: 'Monotonic deque enables O(1) sliding window max/min' },
+    { id: 'dynamic-programming', relationship: 'Monotonic queue optimizes certain DP transitions' },
+    { id: 'arrays-strings', relationship: 'Monotonic stack is an array processing technique' },
+  ],
   
   theory: {
     overview: `A monotonic stack maintains elements in sorted order (all increasing or all decreasing). When adding a new element, we pop elements that break the monotonic property.

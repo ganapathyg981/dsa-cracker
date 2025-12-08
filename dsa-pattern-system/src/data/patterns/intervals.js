@@ -3,6 +3,71 @@ export const intervals = {
   title: 'Intervals',
   icon: '📊',
   difficulty: 'Medium',
+
+  // 🌟 BEGINNER-FRIENDLY INTRODUCTION
+  introduction: {
+    realWorldAnalogy: `You're planning your meeting schedule 📅:
+
+**Meetings:**
+• 9:00-10:30 - Team standup
+• 10:00-11:00 - Design review  ← Overlaps with standup!
+• 11:30-12:30 - Lunch meeting
+• 12:00-13:00 - Client call    ← Overlaps with lunch!
+
+"Can I attend all meetings?" "How many rooms do I need?" "Which meetings can I merge?"
+
+These are all **interval problems**! The key is sorting by start (or end) time.`,
+
+    simpleExplanation: `An interval is a range [start, end]. Interval problems involve:
+• **Merging** overlapping intervals
+• **Checking** if intervals conflict
+• **Counting** maximum concurrent events (meeting rooms)
+• **Inserting** new intervals
+
+**The magic trick:** Sort by start time, then process left to right. Overlapping intervals will be adjacent!
+
+**Overlap condition:** Two intervals [a,b] and [c,d] overlap if: a ≤ d AND c ≤ b`,
+
+    visualSteps: [
+      { step: 1, title: 'Sort by Start Time', description: 'This groups overlapping intervals', visual: 'Arrays.sort(intervals, (a,b) -> a[0]-b[0])' },
+      { step: 2, title: 'Check Overlap', description: 'Does current overlap with previous?', visual: 'current.start <= previous.end → overlap!' },
+      { step: 3, title: 'Merge if Needed', description: 'Extend end to max of both', visual: 'merged.end = max(merged.end, current.end)' },
+      { step: 4, title: 'Process Sequentially', description: 'One pass through sorted intervals', visual: 'for interval in sorted: process(interval)' },
+      { step: 5, title: 'Meeting Rooms?', description: 'Track concurrent count with min heap', visual: 'heap of end times → size = rooms needed' },
+    ],
+
+    keyTakeaway: '💡 Sort by start time first! Then overlapping intervals become adjacent, making the problem much simpler.',
+  },
+
+  // 🎯 PATTERN RECOGNITION SIGNALS
+  recognitionSignals: {
+    keyPhrases: [
+      'merge intervals',
+      'meeting rooms',
+      'schedule conflicts',
+      'overlapping',
+      'time ranges',
+      'free time slots',
+      'insert interval',
+    ],
+    problemCharacteristics: [
+      'Data is in [start, end] format',
+      'Need to detect or resolve overlaps',
+      'Scheduling or resource allocation',
+      'Finding gaps or free slots',
+    ],
+    notSuitableWhen: [
+      'No range/time component',
+      'Single point queries (not intervals)',
+    ],
+  },
+
+  // 🔗 RELATED PATTERNS
+  relatedPatterns: [
+    { id: 'greedy', relationship: 'Many interval problems use greedy (sort by end time)' },
+    { id: 'heaps', relationship: 'Meeting Rooms II uses min heap of end times' },
+    { id: 'binary-search', relationship: 'Insert Interval uses binary search for position' },
+  ],
   
   theory: {
     overview: `Interval problems involve ranges defined by [start, end] pairs. The key insight is that sorting intervals (usually by start time) reveals overlapping structure. After sorting, you only need to check adjacent intervals for overlaps.

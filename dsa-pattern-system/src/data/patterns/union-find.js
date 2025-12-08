@@ -3,6 +3,70 @@ export const unionFind = {
   title: 'Union-Find',
   icon: '🔗',
   difficulty: 'Medium',
+
+  // 🌟 BEGINNER-FRIENDLY INTRODUCTION
+  introduction: {
+    realWorldAnalogy: `Imagine social circles at a party 🎉:
+
+Initially, everyone is their own "group leader." When two people become friends, their groups merge (one person becomes the leader of both groups).
+
+**"Are Alice and Bob connected?"** → Find both their group leaders. Same leader = connected!
+**"Alice meets Bob"** → Merge their groups (Union operation)
+
+Union-Find efficiently tracks these **dynamic groupings**.`,
+
+    simpleExplanation: `Union-Find (Disjoint Set Union) tracks elements divided into groups. Two key operations:
+
+• **Find(x)**: Who is x's group leader? (Which component is x in?)
+• **Union(x, y)**: Merge x's group and y's group
+
+**Two optimizations make it nearly O(1):**
+1. **Path Compression**: When finding leader, make all nodes point directly to root
+2. **Union by Rank**: Attach smaller tree under larger tree
+
+With both: nearly O(1) per operation!`,
+
+    visualSteps: [
+      { step: 1, title: 'Initialize', description: 'Everyone is their own parent', visual: 'parent[i] = i for all i' },
+      { step: 2, title: 'Find with Compression', description: 'Find root, flatten tree along the way', visual: 'parent[x] = find(parent[x]) // path compression' },
+      { step: 3, title: 'Union by Rank', description: 'Attach smaller tree under larger', visual: 'if rank[rootX] > rank[rootY]: attach Y under X' },
+      { step: 4, title: 'Check Connected', description: 'Same root = same component', visual: 'find(x) == find(y) → connected!' },
+      { step: 5, title: 'Count Components', description: 'Track count, decrease on union', visual: 'if find(x) != find(y): union, count--' },
+    ],
+
+    keyTakeaway: '💡 Union-Find answers "are X and Y connected?" in nearly O(1). Perfect for dynamic connectivity and cycle detection!',
+  },
+
+  // 🎯 PATTERN RECOGNITION SIGNALS
+  recognitionSignals: {
+    keyPhrases: [
+      'connected components',
+      'are they connected',
+      'number of islands',
+      'group accounts',
+      'merge accounts',
+      'redundant connection',
+      'cycle in undirected graph',
+    ],
+    problemCharacteristics: [
+      'Need to track connected groups dynamically',
+      'Merging groups based on relationships',
+      'Checking if two elements are in same group',
+      'Counting distinct groups/components',
+    ],
+    notSuitableWhen: [
+      'Need path between nodes (use BFS/DFS)',
+      'Directed graph (Union-Find is for undirected)',
+      'Static connectivity (simple BFS/DFS is fine)',
+    ],
+  },
+
+  // 🔗 RELATED PATTERNS
+  relatedPatterns: [
+    { id: 'graphs', relationship: 'Alternative to BFS/DFS for connectivity queries' },
+    { id: 'bfs-dfs', relationship: 'BFS/DFS find paths; Union-Find just checks connectivity' },
+    { id: 'trees', relationship: 'Union-Find internally uses tree structure' },
+  ],
   
   theory: {
     overview: `Union-Find (Disjoint Set Union / DSU) efficiently tracks elements partitioned into disjoint sets. It supports two operations: find (which set does element belong to?) and union (merge two sets).

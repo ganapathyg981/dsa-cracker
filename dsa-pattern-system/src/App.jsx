@@ -7,8 +7,10 @@ import Menu from './components/Menu';
 import DecisionFlow from './components/DecisionFlow';
 import ResultDisplay from './components/ResultDisplay';
 import ProTips from './components/ProTips';
+import LearningPath from './components/LearningPath';
 import { decisionTrees } from './data/decisionTrees';
 import { topics as legacyTopics } from './data/topics';
+import { topics } from './data/patterns';
 import { getUserProfile, setUserProfile } from './utils/storage';
 import './App.css';
 
@@ -16,6 +18,7 @@ function App() {
   const [activeTab, setActiveTab] = useState('dashboard');
   const [userProfile, setProfile] = useState(null);
   const [showWelcome, setShowWelcome] = useState(false);
+  const [mobilePatternSelectorOpen, setMobilePatternSelectorOpen] = useState(false);
 
   useEffect(() => {
     const profile = getUserProfile();
@@ -77,17 +80,27 @@ function App() {
 
   const currentNode = result ? null : getCurrentNode();
 
+  // Handler to navigate to pattern explorer with a specific pattern
+  const handleSelectPattern = (patternId) => {
+    setActiveTab('explorer');
+    // The PatternExplorer will handle the pattern selection via its own state
+    // We store the selected pattern ID in sessionStorage for PatternExplorer to pick up
+    sessionStorage.setItem('selectedPatternId', patternId);
+  };
+
   const renderContent = () => {
     switch (activeTab) {
       case 'dashboard':
         return <Dashboard />;
+      case 'learning-path':
+        return <LearningPath onSelectPattern={handleSelectPattern} />;
       case 'explorer':
-        return <PatternExplorer />;
+        return <PatternExplorer onMobilePatternSelectorToggle={setMobilePatternSelectorOpen} />;
       case 'decision-tree':
         return activeSection === 'menu' ? (
           <Menu topics={legacyTopics} onTopicSelect={handleTopicSelect} />
         ) : (
-          <div className="min-h-[calc(100vh-57px)] bg-gradient-to-br from-blue-50 to-purple-50 p-8">
+          <div className="min-h-[calc(100vh-49px)] sm:min-h-[calc(100vh-57px)] bg-gradient-to-br from-blue-50 to-purple-50 p-4 sm:p-8">
             <div className="max-w-4xl mx-auto">
               {!result ? (
                 currentNode && (
@@ -101,7 +114,7 @@ function App() {
                   />
                 )
               ) : (
-                <div className="bg-white rounded-2xl shadow-xl p-8">
+                <div className="bg-white rounded-xl sm:rounded-2xl shadow-xl p-4 sm:p-8">
                   <ResultDisplay
                     result={result}
                     onReset={reset}
@@ -118,9 +131,34 @@ function App() {
     }
   };
 
+  // Get current pattern info for mobile nav
+  const [currentPattern, setCurrentPattern] = useState(null);
+
+  useEffect(() => {
+    const updateCurrentPattern = () => {
+      const patternId = sessionStorage.getItem('currentPatternId');
+      if (patternId) {
+        const pattern = topics.find(t => t.id === patternId);
+        setCurrentPattern(pattern || null);
+      } else {
+        setCurrentPattern(null);
+      }
+    };
+
+    updateCurrentPattern();
+    // Listen for pattern changes
+    const interval = setInterval(updateCurrentPattern, 500);
+    return () => clearInterval(interval);
+  }, []);
+
   return (
     <div className="min-h-screen bg-gray-100">
-      <NavigationTabs activeTab={activeTab} onTabChange={setActiveTab} />
+      <NavigationTabs 
+        activeTab={activeTab} 
+        onTabChange={setActiveTab}
+        onMobilePatternClick={() => setMobilePatternSelectorOpen(true)}
+        currentPattern={currentPattern}
+      />
       {renderContent()}
       {showWelcome && <WelcomeModal onComplete={handleWelcomeComplete} />}
     </div>
