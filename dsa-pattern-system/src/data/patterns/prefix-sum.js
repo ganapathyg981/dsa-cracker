@@ -35,7 +35,13 @@ prefix[3] - prefix[0] = 20 - 2 = 18 ✓
       { step: 5, title: 'Extend to 2D', description: 'Rectangle sums in matrices', visual: 'Include/exclude: +bottom_right -left -top +corner' },
     ],
 
-    keyTakeaway: '💡 Prefix Sum trades O(n) space for O(1) range queries. Perfect for multiple range sum queries on static arrays!',
+    keyTakeaway: `💡 Prefix Sum trades O(n) space for O(1) range queries. Perfect for multiple range sum queries on static arrays!
+
+⚠️ WHEN TO USE WHAT FOR SUBARRAY PROBLEMS:
+• MAX/MIN sum → Kadane's Algorithm (Arrays & Strings)
+• EXACT sum K (negatives) → Prefix Sum + HashMap ✓
+• Fixed window size → Sliding Window
+• Variable window (positives) → Sliding Window`,
   },
 
   // 🎯 PATTERN RECOGNITION SIGNALS
@@ -61,6 +67,8 @@ prefix[3] - prefix[0] = 20 - 2 = 18 ✓
       'Used for: Subarray Sum Equals K, Contiguous Array, etc.',
     ],
     notSuitableWhen: [
+      'Finding MAX/MIN sum subarray → Use Kadane\'s Algorithm (Arrays & Strings pattern)',
+      'Fixed window size with positive numbers → Use Sliding Window',
       'Array is modified frequently (use Segment Tree)',
       'Only one range query needed (just sum directly)',
       'Need max/min range queries (not sum)',
@@ -69,9 +77,9 @@ prefix[3] - prefix[0] = 20 - 2 = 18 ✓
 
   // 🔗 RELATED PATTERNS
   relatedPatterns: [
-    { id: 'sliding-window', relationship: 'Both handle contiguous subarrays; prefix sum allows negative numbers' },
-    { id: 'arrays-strings', relationship: 'Prefix sum is a preprocessing technique for arrays' },
-    { id: 'segment-trees', relationship: 'Segment trees handle range queries with updates' },
+    { id: 'arrays-strings', relationship: 'Use Kadane\'s for MAX/MIN subarray sum. Use Prefix Sum + HashMap for EXACT sum with negatives.' },
+    { id: 'sliding-window', relationship: 'Sliding Window works for positive-only arrays. Prefix Sum + HashMap handles negatives for exact sum problems.' },
+    { id: 'segment-trees', relationship: 'Segment trees handle range queries WITH updates (prefix sum is for static arrays)' },
   ],
   
   theory: {
