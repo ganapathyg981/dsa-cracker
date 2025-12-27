@@ -7,7 +7,7 @@ const USER_PROGRESS_PREFIX = 'dsa-progress-';
 const getToken = () => import.meta.env.VITE_GITHUB_TOKEN;
 
 const headers = () => ({
-  'Authorization': `Bearer ${getToken()}`,
+  'Authorization': `Bearer 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`,
   'Accept': 'application/vnd.github+json',
   'X-GitHub-Api-Version': '2022-11-28',
 });
