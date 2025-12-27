@@ -29,7 +29,12 @@ Instead of checking every possible group (which would be slow), we "slide" a win
     ],
 
     // Key insight in simple terms
-    keyTakeaway: '💡 The magic: Instead of recalculating everything in each window (slow), we only update what changed (fast)!',
+    keyTakeaway: `💡 The magic: Instead of recalculating everything in each window (slow), we only update what changed (fast)!
+
+⚠️ IMPORTANT: Sliding Window vs Kadane's Algorithm
+• Sliding Window → Fixed size OR specific constraints (at most K, all unique)
+• Kadane's Algorithm → MAX/MIN sum of ANY size subarray (handles negatives)
+→ See Arrays & Strings pattern for detailed comparison`,
   },
 
   // 🎯 PATTERN RECOGNITION SIGNALS - How to identify when to use this pattern
@@ -60,8 +65,9 @@ Instead of checking every possible group (which would be slow), we "slide" a win
   // 🔗 RELATED PATTERNS - Help learners understand connections
   relatedPatterns: [
     { id: 'two-pointers', relationship: 'Sliding window is a special case of two pointers moving in same direction' },
-    { id: 'prefix-sum', relationship: 'Use prefix sum when sliding window doesn\'t work (negative numbers)' },
-    { id: 'monotonic-stack', relationship: 'Combine with monotonic deque for sliding window max/min' },
+    { id: 'arrays-strings', relationship: 'For MAX/MIN subarray sum with negatives, use Kadane\'s Algorithm (in Arrays pattern) instead of sliding window' },
+    { id: 'prefix-sum', relationship: 'Use prefix sum + HashMap when array has negatives AND you need exact sum' },
+    { id: 'monotonic-stack', relationship: 'Combine with monotonic deque for sliding window max/min elements' },
   ],
   
   theory: {
@@ -82,11 +88,27 @@ The key optimization comes from the fact that consecutive windows share most ele
     ],
 
     whenNotToUse: [
-      'Sliding window works by reusing information as the window moves. For this to work, two rules must hold:',
-      '1. If a wider window is valid, then any narrower window within it must also be valid',
-      '2. If a narrower window is invalid, then any wider window containing it must also be invalid',
+      'Sliding window works by reusing information as the window moves. For this to work, monotonicity must hold:',
+      '• If window becomes invalid, shrinking should make it valid',
+      '• If window is valid, you can try expanding it',
       '',
-      'Example where it FAILS: Subarray sum with negative numbers. Arrays with negative values can violate both rules, making it impossible to safely skip cases.'
+      '❌ SLIDING WINDOW FAILS WHEN:',
+      '1. Finding MAX/MIN sum subarray with NEGATIVE numbers',
+      '   → Use KADANE\'S ALGORITHM instead (see Arrays & Strings pattern)',
+      '   Why? Negatives break monotonicity: shrinking might increase sum!',
+      '   Example: [-5, 10, -3] - removing -5 increases sum',
+      '',
+      '2. Finding subarray with EXACT sum K with NEGATIVE numbers',
+      '   → Use PREFIX SUM + HASHMAP (see Prefix Sum pattern)',
+      '   Why? Can\'t decide whether to expand or shrink',
+      '',
+      '3. Non-contiguous elements needed',
+      '   → Window only handles contiguous subarrays',
+      '',
+      '✅ SLIDING WINDOW WORKS WHEN:',
+      '• Fixed window size K (always works)',
+      '• Variable window with ALL POSITIVE numbers',
+      '• Constraint has monotonic property (adding elements affects validity predictably)'
     ],
     
     complexity: {
