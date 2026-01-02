@@ -586,7 +586,6 @@ Step-by-step:
     { name: 'Valid Anagram', difficulty: 'Easy', tags: ['frequency count'] },
     { name: 'Group Anagrams', difficulty: 'Medium', tags: ['hash grouping'] },
     { name: 'Top K Frequent Elements', difficulty: 'Medium', tags: ['hash map', 'bucket sort'] },
-    { name: 'Product of Array Except Self', difficulty: 'Medium', tags: ['prefix product'] },
     { name: 'Maximum Subarray', difficulty: 'Medium', tags: ['kadane', 'must-know'] },
     { name: 'Maximum Product Subarray', difficulty: 'Medium', tags: ['kadane variation', 'track min/max'] },
     { name: 'Maximum Sum Circular Subarray', difficulty: 'Medium', tags: ['kadane variation'] },

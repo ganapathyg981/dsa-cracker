@@ -7440,6 +7440,534 @@ class Trie {
       spaceComplexity: 'O(n)',
     },
   },
+
+  // ==================== KADANE'S ALGORITHM ====================
+  'Maximum Product Subarray': {
+    leetcodeUrl: 'https://leetcode.com/problems/maximum-product-subarray/',
+    category: 'Core',
+    priority: 1,
+    description: 'Given an integer array nums, find a subarray that has the largest product, and return the product.',
+    examples: [
+      { input: 'nums = [2,3,-2,4]', output: '6', explanation: '[2,3] has the largest product 6.' },
+      { input: 'nums = [-2,0,-1]', output: '0', explanation: 'The result cannot be 2, because [-2,-1] is not a subarray.' },
+    ],
+    hints: [
+      'Track both max and min products (negatives can flip)',
+      'A negative times a negative becomes positive',
+      'Reset when encountering zero',
+    ],
+    solution: {
+      approach: 'Track both maxSoFar and minSoFar because a negative min can become max when multiplied by negative.',
+      java: `public int maxProduct(int[] nums) {
+    int maxProd = nums[0], minProd = nums[0], result = nums[0];
+    for (int i = 1; i < nums.length; i++) {
+        if (nums[i] < 0) {
+            int temp = maxProd;
+            maxProd = minProd;
+            minProd = temp;
+        }
+        maxProd = Math.max(nums[i], maxProd * nums[i]);
+        minProd = Math.min(nums[i], minProd * nums[i]);
+        result = Math.max(result, maxProd);
+    }
+    return result;
+}`,
+      timeComplexity: 'O(n)',
+      spaceComplexity: 'O(1)',
+    },
+  },
+
+  'Maximum Sum Circular Subarray': {
+    leetcodeUrl: 'https://leetcode.com/problems/maximum-sum-circular-subarray/',
+    category: 'Core',
+    priority: 2,
+    description: 'Given a circular integer array nums, return the maximum possible sum of a non-empty subarray.',
+    examples: [
+      { input: 'nums = [1,-2,3,-2]', output: '3', explanation: 'Subarray [3] has maximum sum 3.' },
+      { input: 'nums = [5,-3,5]', output: '10', explanation: 'Subarray [5,5] has maximum sum 10 (wraps around).' },
+    ],
+    hints: [
+      'Two cases: max subarray in middle OR wrapping around',
+      'Wrapping max = totalSum - minSubarray',
+      'Handle edge case when all elements are negative',
+    ],
+    solution: {
+      approach: 'Answer is max(normalKadane, totalSum - minSubarray). Edge case: if all negative, return normalKadane.',
+      java: `public int maxSubarraySumCircular(int[] nums) {
+    int totalSum = 0, maxSum = nums[0], curMax = 0;
+    int minSum = nums[0], curMin = 0;
+    for (int num : nums) {
+        curMax = Math.max(curMax + num, num);
+        maxSum = Math.max(maxSum, curMax);
+        curMin = Math.min(curMin + num, num);
+        minSum = Math.min(minSum, curMin);
+        totalSum += num;
+    }
+    return maxSum > 0 ? Math.max(maxSum, totalSum - minSum) : maxSum;
+}`,
+      timeComplexity: 'O(n)',
+      spaceComplexity: 'O(1)',
+    },
+  },
+
+  'Encode and Decode Strings': {
+    leetcodeUrl: 'https://leetcode.com/problems/encode-and-decode-strings/',
+    category: 'Core',
+    priority: 3,
+    description: 'Design an algorithm to encode a list of strings to a string and decode it back.',
+    examples: [
+      { input: '["lint","code","love","you"]', output: '["lint","code","love","you"]', explanation: 'Encode then decode returns original.' },
+    ],
+    hints: [
+      'Use length prefix: "4#lint4#code"',
+      'Or use a delimiter that cannot appear in strings',
+      'Length prefix is safer and handles any character',
+    ],
+    solution: {
+      approach: 'Encode as length + delimiter + string. Decode by reading length, then extracting that many chars.',
+      java: `public String encode(List<String> strs) {
+    StringBuilder sb = new StringBuilder();
+    for (String s : strs) {
+        sb.append(s.length()).append('#').append(s);
+    }
+    return sb.toString();
+}
+
+public List<String> decode(String s) {
+    List<String> result = new ArrayList<>();
+    int i = 0;
+    while (i < s.length()) {
+        int j = i;
+        while (s.charAt(j) != '#') j++;
+        int len = Integer.parseInt(s.substring(i, j));
+        result.add(s.substring(j + 1, j + 1 + len));
+        i = j + 1 + len;
+    }
+    return result;
+}`,
+      timeComplexity: 'O(n)',
+      spaceComplexity: 'O(1)',
+    },
+  },
+
+  // ==================== HEAPS ====================
+  'Kth Largest Element in Array': {
+    leetcodeUrl: 'https://leetcode.com/problems/kth-largest-element-in-an-array/',
+    category: 'Core',
+    priority: 1,
+    description: 'Given an integer array nums and an integer k, return the kth largest element in the array.',
+    examples: [
+      { input: 'nums = [3,2,1,5,6,4], k = 2', output: '5', explanation: 'Sorted: [6,5,4,3,2,1], 2nd largest is 5.' },
+    ],
+    hints: [
+      'Min-heap of size k keeps k largest elements',
+      'Or use QuickSelect for O(n) average',
+      'Heap approach is O(n log k)',
+    ],
+    solution: {
+      approach: 'Use min-heap of size k. Heap top is kth largest after processing all elements.',
+      java: `public int findKthLargest(int[] nums, int k) {
+    PriorityQueue<Integer> minHeap = new PriorityQueue<>();
+    for (int num : nums) {
+        minHeap.offer(num);
+        if (minHeap.size() > k) {
+            minHeap.poll();
+        }
+    }
+    return minHeap.peek();
+}`,
+      timeComplexity: 'O(n log k)',
+      spaceComplexity: 'O(k)',
+    },
+  },
+
+  'Top K Frequent Elements': {
+    leetcodeUrl: 'https://leetcode.com/problems/top-k-frequent-elements/',
+    category: 'Core',
+    priority: 2,
+    description: 'Given an integer array nums and an integer k, return the k most frequent elements.',
+    examples: [
+      { input: 'nums = [1,1,1,2,2,3], k = 2', output: '[1,2]', explanation: '1 appears 3 times, 2 appears 2 times.' },
+    ],
+    hints: [
+      'Count frequencies first with HashMap',
+      'Use min-heap of size k based on frequency',
+      'Or use bucket sort for O(n) solution',
+    ],
+    solution: {
+      approach: 'Count frequencies, then use min-heap of size k ordered by frequency.',
+      java: `public int[] topKFrequent(int[] nums, int k) {
+    Map<Integer, Integer> freq = new HashMap<>();
+    for (int num : nums) {
+        freq.put(num, freq.getOrDefault(num, 0) + 1);
+    }
+    PriorityQueue<Integer> minHeap = new PriorityQueue<>(
+        (a, b) -> freq.get(a) - freq.get(b)
+    );
+    for (int num : freq.keySet()) {
+        minHeap.offer(num);
+        if (minHeap.size() > k) minHeap.poll();
+    }
+    int[] result = new int[k];
+    for (int i = 0; i < k; i++) {
+        result[i] = minHeap.poll();
+    }
+    return result;
+}`,
+      timeComplexity: 'O(n log k)',
+      spaceComplexity: 'O(n)',
+    },
+  },
+
+  // ==================== MONOTONIC STACK ====================
+  'Next Greater Element I/II': {
+    leetcodeUrl: 'https://leetcode.com/problems/next-greater-element-i/',
+    category: 'Core',
+    priority: 1,
+    description: 'Find the next greater element for each element in an array.',
+    examples: [
+      { input: 'nums = [4,1,2], lookup in [1,3,4,2]', output: '[-1,3,-1]', explanation: 'Next greater of 4 is -1, 1 is 3, 2 is -1.' },
+    ],
+    hints: [
+      'Use monotonic decreasing stack',
+      'Store indices not values',
+      'For circular array (II), iterate twice or use modulo',
+    ],
+    solution: {
+      approach: 'Maintain decreasing stack. When current > stack top, pop and set result for popped index.',
+      java: `public int[] nextGreaterElements(int[] nums) {
+    int n = nums.length;
+    int[] result = new int[n];
+    Arrays.fill(result, -1);
+    Deque<Integer> stack = new ArrayDeque<>();
+    for (int i = 0; i < 2 * n; i++) {
+        int num = nums[i % n];
+        while (!stack.isEmpty() && nums[stack.peek()] < num) {
+            result[stack.pop()] = num;
+        }
+        if (i < n) stack.push(i);
+    }
+    return result;
+}`,
+      timeComplexity: 'O(n)',
+      spaceComplexity: 'O(n)',
+    },
+  },
+
+  'Sliding Window Maximum': {
+    leetcodeUrl: 'https://leetcode.com/problems/sliding-window-maximum/',
+    category: 'Core',
+    priority: 2,
+    description: 'Return the max sliding window for each position as a window of size k slides through array.',
+    examples: [
+      { input: 'nums = [1,3,-1,-3,5,3,6,7], k = 3', output: '[3,3,5,5,6,7]', explanation: 'Max in each window of size 3.' },
+    ],
+    hints: [
+      'Use monotonic decreasing deque',
+      'Front of deque is always the max',
+      'Remove elements outside window from front',
+    ],
+    solution: {
+      approach: 'Maintain decreasing deque of indices. Front is max. Remove out-of-window elements.',
+      java: `public int[] maxSlidingWindow(int[] nums, int k) {
+    int n = nums.length;
+    int[] result = new int[n - k + 1];
+    Deque<Integer> dq = new ArrayDeque<>();
+    for (int i = 0; i < n; i++) {
+        while (!dq.isEmpty() && dq.peekFirst() < i - k + 1) {
+            dq.pollFirst();
+        }
+        while (!dq.isEmpty() && nums[dq.peekLast()] < nums[i]) {
+            dq.pollLast();
+        }
+        dq.offerLast(i);
+        if (i >= k - 1) {
+            result[i - k + 1] = nums[dq.peekFirst()];
+        }
+    }
+    return result;
+}`,
+      timeComplexity: 'O(n)',
+      spaceComplexity: 'O(k)',
+    },
+  },
+
+  // ==================== INTERVALS ====================
+  'My Calendar I/II/III': {
+    leetcodeUrl: 'https://leetcode.com/problems/my-calendar-i/',
+    category: 'Core',
+    priority: 3,
+    description: 'Implement a calendar that checks for booking conflicts (I: no overlap, II: allow double, III: count max overlap).',
+    examples: [
+      { input: 'book(10, 20), book(15, 25)', output: 'true, false (for Calendar I)', explanation: '[10,20) and [15,25) overlap.' },
+    ],
+    hints: [
+      'Calendar I: Check overlap with all existing bookings',
+      'Calendar II: Track single and double bookings separately',
+      'Calendar III: Use sweep line to count max concurrent events',
+    ],
+    solution: {
+      approach: 'For I: linear scan. For II: track overlaps separately. For III: use TreeMap for sweep line.',
+      java: `// Calendar I
+class MyCalendar {
+    List<int[]> bookings = new ArrayList<>();
+    
+    public boolean book(int start, int end) {
+        for (int[] b : bookings) {
+            if (Math.max(start, b[0]) < Math.min(end, b[1])) {
+                return false;
+            }
+        }
+        bookings.add(new int[]{start, end});
+        return true;
+    }
+}`,
+      timeComplexity: 'O(n) per booking for I, O(n²) for II',
+      spaceComplexity: 'O(n)',
+    },
+  },
+
+  // ==================== TRIES ====================
+  'Maximum XOR of Two Numbers': {
+    leetcodeUrl: 'https://leetcode.com/problems/maximum-xor-of-two-numbers-in-an-array/',
+    category: 'Advanced',
+    priority: 3,
+    description: 'Given an integer array nums, return the maximum XOR of two numbers in the array.',
+    examples: [
+      { input: 'nums = [3,10,5,25,2,8]', output: '28', explanation: 'Maximum XOR is 5 ^ 25 = 28.' },
+    ],
+    hints: [
+      'Build a bit trie (binary trie)',
+      'For each number, greedily choose opposite bit',
+      'Process from most significant bit to least',
+    ],
+    solution: {
+      approach: 'Build trie of binary representations. For each num, traverse trie choosing opposite bits when possible.',
+      java: `public int findMaximumXOR(int[] nums) {
+    TrieNode root = new TrieNode();
+    int max = 0;
+    for (int num : nums) {
+        TrieNode node = root, xorNode = root;
+        int xor = 0;
+        for (int i = 31; i >= 0; i--) {
+            int bit = (num >> i) & 1;
+            if (node.children[bit] == null) {
+                node.children[bit] = new TrieNode();
+            }
+            node = node.children[bit];
+            if (xorNode.children[1 - bit] != null) {
+                xor |= (1 << i);
+                xorNode = xorNode.children[1 - bit];
+            } else {
+                xorNode = xorNode.children[bit];
+            }
+        }
+        max = Math.max(max, xor);
+    }
+    return max;
+}`,
+      timeComplexity: 'O(32n) = O(n)',
+      spaceComplexity: 'O(32n) = O(n)',
+    },
+  },
+
+  'Design Add and Search Words': {
+    leetcodeUrl: 'https://leetcode.com/problems/design-add-and-search-words-data-structure/',
+    category: 'Core',
+    priority: 1,
+    description: 'Design a data structure that supports adding words and searching with wildcards (.).',
+    examples: [
+      { input: 'addWord("bad"), search("b.d")', output: 'true', explanation: '"." matches any character.' },
+    ],
+    hints: [
+      'Use standard Trie for addWord',
+      'For search with ".", try all 26 children recursively',
+      'Use DFS/backtracking for wildcard matching',
+    ],
+    solution: {
+      approach: 'Standard Trie insert. For search, when encountering ".", recursively try all children.',
+      java: `class WordDictionary {
+    TrieNode root = new TrieNode();
+    
+    public void addWord(String word) {
+        TrieNode node = root;
+        for (char c : word.toCharArray()) {
+            if (node.children[c - 'a'] == null) {
+                node.children[c - 'a'] = new TrieNode();
+            }
+            node = node.children[c - 'a'];
+        }
+        node.isWord = true;
+    }
+    
+    public boolean search(String word) {
+        return dfs(word, 0, root);
+    }
+    
+    private boolean dfs(String word, int idx, TrieNode node) {
+        if (idx == word.length()) return node.isWord;
+        char c = word.charAt(idx);
+        if (c == '.') {
+            for (TrieNode child : node.children) {
+                if (child != null && dfs(word, idx + 1, child)) return true;
+            }
+            return false;
+        }
+        if (node.children[c - 'a'] == null) return false;
+        return dfs(word, idx + 1, node.children[c - 'a']);
+    }
+}`,
+      timeComplexity: 'O(m) add, O(26^m) worst search with all dots',
+      spaceComplexity: 'O(total characters)',
+    },
+  },
+
+  'Replace Words': {
+    leetcodeUrl: 'https://leetcode.com/problems/replace-words/',
+    category: 'Core',
+    priority: 2,
+    description: 'Replace words in a sentence with their shortest root from a dictionary.',
+    examples: [
+      { input: 'dictionary = ["cat","bat","rat"], sentence = "the cattle was rattled"', output: '"the cat was rat"', explanation: 'cattle → cat, rattled → rat.' },
+    ],
+    hints: [
+      'Build Trie from dictionary roots',
+      'For each word, find shortest prefix that is a root',
+      'Stop at first isWord node encountered',
+    ],
+    solution: {
+      approach: 'Build Trie of roots. For each word in sentence, traverse Trie and return first complete root found.',
+      java: `public String replaceWords(List<String> dictionary, String sentence) {
+    TrieNode root = new TrieNode();
+    for (String word : dictionary) {
+        TrieNode node = root;
+        for (char c : word.toCharArray()) {
+            if (node.children[c - 'a'] == null) {
+                node.children[c - 'a'] = new TrieNode();
+            }
+            node = node.children[c - 'a'];
+        }
+        node.isWord = true;
+    }
+    StringBuilder result = new StringBuilder();
+    for (String word : sentence.split(" ")) {
+        if (result.length() > 0) result.append(" ");
+        TrieNode node = root;
+        StringBuilder prefix = new StringBuilder();
+        for (char c : word.toCharArray()) {
+            if (node.children[c - 'a'] == null || node.isWord) break;
+            prefix.append(c);
+            node = node.children[c - 'a'];
+        }
+        result.append(node.isWord ? prefix : word);
+    }
+    return result.toString();
+}`,
+      timeComplexity: 'O(d*w + s*w) where d=dict size, s=sentence words, w=avg word length',
+      spaceComplexity: 'O(d*w)',
+    },
+  },
+
+  // ==================== TREES ====================
+  'Lowest Common Ancestor': {
+    leetcodeUrl: 'https://leetcode.com/problems/lowest-common-ancestor-of-a-binary-tree/',
+    category: 'Core',
+    priority: 1,
+    description: 'Find the lowest common ancestor of two nodes in a binary tree.',
+    examples: [
+      { input: 'root = [3,5,1,6,2,0,8], p = 5, q = 1', output: '3', explanation: 'LCA of 5 and 1 is 3.' },
+    ],
+    hints: [
+      'If current node is p or q, return it',
+      'Recursively search left and right subtrees',
+      'If both sides return non-null, current is LCA',
+    ],
+    solution: {
+      approach: 'Recursive: if node is p or q, return it. If found in both subtrees, node is LCA. Else return non-null side.',
+      java: `public TreeNode lowestCommonAncestor(TreeNode root, TreeNode p, TreeNode q) {
+    if (root == null || root == p || root == q) return root;
+    TreeNode left = lowestCommonAncestor(root.left, p, q);
+    TreeNode right = lowestCommonAncestor(root.right, p, q);
+    if (left != null && right != null) return root;
+    return left != null ? left : right;
+}`,
+      timeComplexity: 'O(n)',
+      spaceComplexity: 'O(h)',
+    },
+  },
+
+  'Construct Binary Tree from Traversals': {
+    leetcodeUrl: 'https://leetcode.com/problems/construct-binary-tree-from-preorder-and-inorder-traversal/',
+    category: 'Core',
+    priority: 2,
+    description: 'Construct a binary tree from preorder and inorder traversal arrays.',
+    examples: [
+      { input: 'preorder = [3,9,20,15,7], inorder = [9,3,15,20,7]', output: '[3,9,20,null,null,15,7]', explanation: 'Tree reconstructed from traversals.' },
+    ],
+    hints: [
+      'Preorder first element is root',
+      'Find root in inorder to split left/right subtrees',
+      'Use HashMap for O(1) lookup in inorder',
+    ],
+    solution: {
+      approach: 'Preorder gives root. Find root in inorder to determine left/right subtree sizes. Recurse.',
+      java: `Map<Integer, Integer> inorderMap = new HashMap<>();
+int preIdx = 0;
+
+public TreeNode buildTree(int[] preorder, int[] inorder) {
+    for (int i = 0; i < inorder.length; i++) {
+        inorderMap.put(inorder[i], i);
+    }
+    return build(preorder, 0, inorder.length - 1);
+}
+
+private TreeNode build(int[] preorder, int left, int right) {
+    if (left > right) return null;
+    int rootVal = preorder[preIdx++];
+    TreeNode root = new TreeNode(rootVal);
+    int mid = inorderMap.get(rootVal);
+    root.left = build(preorder, left, mid - 1);
+    root.right = build(preorder, mid + 1, right);
+    return root;
+}`,
+      timeComplexity: 'O(n)',
+      spaceComplexity: 'O(n)',
+    },
+  },
+
+  'Diameter of Binary Tree': {
+    leetcodeUrl: 'https://leetcode.com/problems/diameter-of-binary-tree/',
+    category: 'Foundation',
+    priority: 1,
+    description: 'Find the length of the longest path between any two nodes in a tree (may not pass through root).',
+    examples: [
+      { input: 'root = [1,2,3,4,5]', output: '3', explanation: 'Path 4→2→1→3 or 5→2→1→3 has length 3.' },
+    ],
+    hints: [
+      'Diameter through a node = leftHeight + rightHeight',
+      'Track global max while computing heights',
+      'Use post-order traversal',
+    ],
+    solution: {
+      approach: 'At each node, diameter = left height + right height. Track global max. Return height for parent.',
+      java: `int diameter = 0;
+
+public int diameterOfBinaryTree(TreeNode root) {
+    height(root);
+    return diameter;
+}
+
+private int height(TreeNode node) {
+    if (node == null) return 0;
+    int left = height(node.left);
+    int right = height(node.right);
+    diameter = Math.max(diameter, left + right);
+    return 1 + Math.max(left, right);
+}`,
+      timeComplexity: 'O(n)',
+      spaceComplexity: 'O(h)',
+    },
+  },
 };
 
 // Helper function to get enhanced problem data
